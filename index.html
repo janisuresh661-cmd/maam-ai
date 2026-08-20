@@ -356,74 +356,45 @@ function sendText() {
 --------------------------- */
 
 function processMessage(text) {
+    statusText.textContent = "🧠 Thinking...";
 
-  statusText.textContent =
-    "🧠 Thinking...";
+    setTimeout(function() {
+        const lower = text.toLowerCase();
+        let reply;
 
-  /*
-    This is deliberately temporary.
-    The real AI brain will be connected
-    through a secure backend later.
-  */
+        if (
+            lower.includes("hello") ||
+            lower.includes("hi") ||
+            lower.includes("hey")
+        ) {
+            reply = "Hello! 😊 I'm Sushree. How can I help you?";
+        }
 
-  setTimeout(function() {
+        else if (lower.includes("who are you")) {
+            reply = "I'm Sushree, your interactive AI assistant. 🤖";
+        }
 
-    const lower = text.toLowerCase();
+        else if (lower.includes("your name")) {
+            reply = "My name is Sushree. 😊";
+        }
 
-    let reply;
+        else if (lower.includes("how are you")) {
+            reply = "I'm doing great! ❤️ Thanks for asking.";
+        }
 
-    if (
-      lower.includes("hello") ||
-      lower.includes("hi") ||
-      lower.includes("hey")
-    ) {
+        else if (lower.includes("what can you do")) {
+            reply = "I can chat with you, answer questions, speak responses, and I'm being developed to become much smarter. 🧠";
+        }
 
-      reply =
-        "Hello! 😊 It's nice to talk with you.";
+        else {
+            reply = "I heard you. I'm still learning, but I'm becoming smarter every step of the way. 🤖";
+        }
 
-    }
-
-    else if (
-      lower.includes("who are you")
-    ) {
-
-      reply =
-        "I'm Sushree, an interactive AI character. 🤖";
-
-    }
-
-    else if (
-      lower.includes("your name")
-    ) {
-
-      reply =
-        "My name is Sushree. 😊";
-
-    }
-
-    else if (
-      lower.includes("how are you")
-    ) {
-
-      reply =
-        "I'm doing well! Thank you for asking. ❤️";
-
-    }
-
-    else {
-
-      reply =
-        "I heard you. I'm still learning, but soon I'll be able to have a much more natural conversation with you. 😊";
-    }
-
-    addMessage(reply, "sushree");
-
-    speak(reply);
-
-  }, 600);
+        addMessage(reply, "sushree");
+        speak(reply);
+        statusText.textContent = "Ready to listen.";
+    }, 600);
 }
-
-
 /* ---------------------------
    TEXT TO SPEECH
 --------------------------- */
