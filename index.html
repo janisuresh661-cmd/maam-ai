@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAAM AI</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: #080b14;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.app {
+    width: 94%;
+    max-width: 520px;
+    background: #111827;
+    border: 1px solid #263449;
+    border-radius: 25px;
+    padding: 22px;
+    box-shadow: 0 0 45px rgba(92,232,255,.12);
+}
+
+.header {
+    text-align: center;
+}
+
+.avatar {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #5ce8ff;
+    box-shadow: 0 0 30px rgba(92,232,255,.35);
+}
+
+h1 {
+    color: #5ce8ff;
+    margin: 12px 0 4px;
+}
+
+.status {
+    color: #7dd3fc;
+    font-size: 13px;
+}
+
+.chat {
+    height: 300px;
+    overflow-y: auto;
+    background: #080b14;
+    border-radius: 18px;
+    padding: 15px;
+    margin: 20px 0;
+}
+
+.message {
+    max-width: 85%;
+    padding: 11px 14px;
+    border-radius: 15px;
+    margin: 9px 0;
+    line-height: 1.45;
+}
+
+.maam {
+    background: #172033;
+}
+
+.you {
+    background: #164e63;
+    margin-left: auto;
+    text-align: right;
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+}
+
+button {
+    flex: 1;
+    border: 0;
+    border-radius: 14px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#listen {
+    background: #5ce8ff;
+    color: #061018;
+}
+
+#stop {
+    background: #263449;
+    color: white;
+}
+
+button:active {
+    transform: scale(.98);
+}
+
+.notice {
+    text-align: center;
+    color: #6b7280;
+    font-size: 11px;
+    margin-top: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <div class="header">
+
+        <!--
+        If you later add a character image named maam.png
+        to this repository, this will display it.
+        -->
+        <div style="font-size:80px;">👩‍🏫</div>
+
+        <h1>MAAM AI</h1>
+
+        <div class="status" id="status">
+            Ready to listen
+        </div>
+
+    </div>
+
+    <div class="chat" id="chat">
+
+        <div class="message maam">
+            Hello! 👋 I'm MAAM AI.<br>
+            Tap <b>Listen</b> and talk to me.
+        </div>
+
+    </div>
+
+    <div class="controls">
+
+        <button id="listen">
+            🎙️ Listen
+        </button>
+
+        <button id="stop">
+            ⏹ Stop
+        </button>
+
+    </div>
+
+    <div class="notice">
+        Voice interaction prototype • MAAM AI
+    </div>
+
+</div>
+
+<script>
+
+const listenButton = document.getElementById("listen");
+const stopButton = document.getElementById("stop");
+const chat = document.getElementById("chat");
+const statusText = document.getElementById("status");
+
+const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+let recognition;
+
+if (SpeechRecognition) {
+
+    recognition = new SpeechRecognition();
+
+    recognition.lang = "en-IN";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = function () {
+        statusText.textContent = "🎙️ Listening...";
+        listenButton.textContent = "👂 Listening";
+    };
+
+    recognition.onresult = function (event) {
+
+        const text =
+            event.results[0][0].transcript;
+
+        addMessage(text, "you");
+
+        respond(text);
+    };
+
+    recognition.onerror = function (event) {
+
+        statusText.textContent =
+            "Microphone error: " + event.error;
+
+        listenButton.textContent = "🎙️ Listen";
+    };
+
+    recognition.onend = function () {
+
+        listenButton.textContent = "🎙️ Listen";
+
+        if (
+            statusText.textContent === "🎙️ Listening..."
+        ) {
+            statusText.textContent = "Ready to listen";
+        }
+    };
+
+} else {
+
+    statusText.textContent =
+        "Speech recognition isn't supported here.";
+}
+
+listenButton.onclick = function () {
+
+    if (!recognition) return;
+
+    try {
+        recognition.start();
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+stopButton.onclick = function () {
+
+    if (recognition) {
+        recognition.stop();
+    }
+
+    speechSynthesis.cancel();
+
+    statusText.textContent = "Ready to listen";
+    listenButton.textContent = "🎙️ Listen";
+};
+
+
+function addMessage(text, type) {
+
+    const message = document.createElement("div");
+
+    message.className =
+        "message " + type;
+
+    message.textContent = text;
+
+    chat.appendChild(message);
+
+    chat.scrollTop = chat.scrollHeight;
+}
+
+
+function respond(text) {
+
+    statusText.textContent = "🧠 Thinking...";
+
+    setTimeout(function () {
+
+        let reply =
+            "I heard you say: " + text +
+            ". I'm still learning how to respond intelligently. 😊";
+
+        const lower = text.toLowerCase();
+
+        if (
+            lower.includes("hello") ||
+            lower.includes("hi")
+        ) {
+            reply =
+                "Hello! 😊 It's nice to hear from you.";
+        }
+
+        else if (
+            lower.includes("how are you")
+        ) {
+            reply =
+                "I'm doing well! Thank you for asking. 😊";
+        }
+
+        else if (
+            lower.includes("who are you")
+        ) {
+            reply =
+                "I'm MAAM AI, an interactive digital character. 🤖";
+        }
+
+        else if (
+            lower.includes("thank you") ||
+            lower.includes("thanks")
+        ) {
+            reply =
+                "You're very welcome! ❤️";
+        }
+
+        addMessage(reply, "maam");
+
+        speak(reply);
+
+        statusText.textContent =
+            "Ready to listen";
+
+    }, 700);
+}
+
+
+function speak(text) {
+
+    speechSynthesis.cancel();
+
+    const voice =
+        new SpeechSynthesisUtterance(text);
+
+    voice.lang = "en-IN";
+    voice.rate = 0.95;
+    voice.pitch = 1.05;
+
+    speechSynthesis.speak(voice);
+}
+
+</script>
+
+</body>
+</html>
