@@ -430,46 +430,43 @@ function processMessage(text) {
 
 function speak(text) {
 
-  if (!("speechSynthesis" in window)) {
+    if (!("speechSynthesis" in window)) {
+        statusText.textContent = "Speech not supported.";
+        return;
+    }
 
-    statusText.textContent =
-      "Response ready.";
+    speechSynthesis.cancel();
 
-    return;
-  }
+    // Remove emojis before speaking
+    const cleanText = text
+        .replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "")
+        .replace(/\s+/g, " ")
+        .trim();
 
-  speechSynthesis.cancel();
+    if (!cleanText) return;
 
-  const utterance =
-    new SpeechSynthesisUtterance(text);
+    const utterance =
+        new SpeechSynthesisUtterance(cleanText);
 
-  utterance.lang = "en-IN";
+    utterance.lang = "en-IN";
+    utterance.rate = 0.95;
+    utterance.pitch = 1.05;
+    utterance.volume = 1;
 
-  utterance.rate = 0.95;
+    utterance.onstart = function() {
+        statusText.textContent =
+            "🔊 Sushree is speaking...";
+        character.classList.add("speaking");
+    };
 
-  utterance.pitch = 1.05;
+    utterance.onend = function() {
+        statusText.textContent =
+            "Ready to listen";
+        character.classList.remove("speaking");
+    };
 
-  utterance.volume = 1;
-
-  utterance.onstart = function() {
-
-    statusText.textContent =
-      "🔊 Sushree is speaking...";
-
-    character.classList.add("speaking");
-  };
-
-  utterance.onend = function() {
-
-    statusText.textContent =
-      "Ready to listen";
-
-    character.classList.remove("speaking");
-  };
-
-  speechSynthesis.speak(utterance);
+    speechSynthesis.speak(utterance);
 }
-
 
 /* ---------------------------
    STOP
