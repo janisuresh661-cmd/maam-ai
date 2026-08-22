@@ -411,6 +411,7 @@ if (data.success && data.reply) {
     });
 
     addMessage(data.reply, "assistant");
+  speak(data.reply);
 } else {
       addMessage(
         data.error || "Sorry, I couldn't get a response right now.",
