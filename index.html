@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sushree AI</title>
 
-<style>
+  <style>
 * {
   box-sizing: border-box;
 }
@@ -78,6 +78,21 @@ body {
   animation: listenPulse 1.2s infinite;
 }
 
+  .character.thinking {
+  animation: thinkingPulse 1.5s infinite ease-in-out;
+}
+
+@keyframes thinkingPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 35px rgba(92, 232, 255, .35);
+  }
+
+  50% {
+    transform: scale(1.025);
+    box-shadow: 0 0 48px rgba(167, 139, 250, .65);
+  }
+}
 .character.speaking {
   animation: speakPulse .45s infinite alternate;
 }
@@ -189,7 +204,49 @@ button {
   color: #64748b;
   font-size: 11px;
 }
-</style>
+/* Sushree feels alive */
+.character {
+  animation: naturalBreathing 4s ease-in-out infinite;
+}
+
+.character img {
+  transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+/* Gentle natural breathing */
+@keyframes naturalBreathing {
+  0%, 100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.015);
+  }
+}
+
+/* Soft idle glow */
+.character:not(.listening):not(.thinking):not(.speaking) {
+  box-shadow: 0 0 35px rgba(92, 232, 255, 0.35);
+}
+
+/* Thinking state */
+.character.thinking img {
+  transform: scale(1.02);
+  filter: brightness(1.05);
+}
+
+/* Speaking state */
+.character.speaking img {
+  transform: scale(1.025);
+  filter: brightness(1.1);
+}
+
+/* Listening state */
+.character.listening img {
+  transform: scale(1.015);
+  filter: brightness(1.08);
+}
+  </style>
 </head>
 
 <body>
