@@ -63,6 +63,14 @@ body {
   border: 3px solid #5ce8ff;
   box-shadow: 0 0 35px rgba(92, 232, 255, .35);
   transition: .3s;
+    overflow: hidden;
+}
+
+.character img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 }
 
 .character.listening {
@@ -181,7 +189,7 @@ button {
   </div>
 
   <div id="character" class="character">
-    👩‍🏫
+    <img src="Sushree.png" alt="Sushree">
   </div>
 
   <div id="status" class="status">
