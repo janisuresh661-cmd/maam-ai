@@ -372,8 +372,9 @@ async function processMessage(text) {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          message: text
-        })
+    message: text,
+    history: history
+})
       }
     );
 
