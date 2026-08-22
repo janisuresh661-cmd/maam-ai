@@ -246,7 +246,12 @@ function addMessage(text, type) {
 
   message.className = "message " + type;
 
-  message.textContent = text;
+  message.innerHTML = text
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/^### (.*)$/gm, "<h3>$1</h3>")
+    .replace(/^## (.*)$/gm, "<h2>$1</h2>")
+    .replace(/^# (.*)$/gm, "<h1>$1</h1>")
+    .replace(/\n/g, "<br>");
 
   chat.appendChild(message);
 
