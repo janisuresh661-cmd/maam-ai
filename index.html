@@ -397,9 +397,19 @@ async function processMessage(text) {
       );
     }
 
-    if (data.success && data.reply) {
-      addMessage(data.reply, "assistant");
-    } else {
+if (data.success && data.reply) {
+    history.push({
+        role: "user",
+        parts: [{ text: text }]
+    });
+
+    history.push({
+        role: "model",
+        parts: [{ text: data.reply }]
+    });
+
+    addMessage(data.reply, "assistant");
+} else {
       addMessage(
         data.error || "Sorry, I couldn't get a response right now.",
         "assistant"
