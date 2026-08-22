@@ -392,10 +392,12 @@ async function processMessage(text) {
     console.log("Worker response:", data);
 
     if (!response.ok) {
-      throw new Error(
-        data.error || `Worker returned HTTP ${response.status}`
-      );
-    }
+    throw new Error(
+        data.details
+            ? JSON.stringify(data.details)
+            : (data.error || `Worker returned HTTP ${response.status}`)
+    );
+}
 
 if (data.success && data.reply) {
     history.push({
