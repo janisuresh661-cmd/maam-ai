@@ -72,7 +72,6 @@ body {
   object-fit: cover;
   object-position: top;
 }
-}
 
 .character.listening {
   animation: listenPulse 1.2s infinite;
@@ -334,8 +333,8 @@ let history = [];
 function composerAction() {
   const button = document.getElementById("composerButton");
 
-  // If Sushree is listening, stop
-  if (recognition) {
+  // If listening or speaking, stop everything
+  if (recognition || speechSynthesis.speaking) {
     stopEverything();
 
     button.textContent = "🎙️";
@@ -439,16 +438,32 @@ function listen() {
 
   recognition.onerror = function() {
 
-    character.classList.remove("listening");
+  character.classList.remove("listening");
 
-    statusText.textContent =
-      "I couldn't hear that. Try again.";
-  };
+  recognition = null;
+
+  statusText.textContent =
+    "I couldn't hear that. Try again.";
+
+  const button = document.getElementById("composerButton");
+
+  button.textContent = "🎙️";
+  button.classList.remove("stop-mode");
+  button.setAttribute("aria-label", "Speak");
+};
 
   recognition.onend = function() {
 
-    character.classList.remove("listening");
-  };
+  character.classList.remove("listening");
+
+  recognition = null;
+
+  const button = document.getElementById("composerButton");
+
+  button.textContent = "🎙️";
+  button.classList.remove("stop-mode");
+  button.setAttribute("aria-label", "Speak");
+};
 
   try {
 
@@ -609,6 +624,13 @@ function stopEverything() {
       recognition.stop();
     } catch(error) {}
   }
+  recognition = null;
+
+const button = document.getElementById("composerButton");
+
+button.textContent = "🎙️";
+button.classList.remove("stop-mode");
+button.setAttribute("aria-label", "Speak");
 
   speechSynthesis.cancel();
 
