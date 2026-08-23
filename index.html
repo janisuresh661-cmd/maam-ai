@@ -603,6 +603,8 @@ function speak(text) {
 
     speechSynthesis.cancel();
 
+    const button = document.getElementById("composerButton");
+
     // Remove emojis before speaking
     const cleanText = text
         .replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "")
@@ -620,15 +622,31 @@ function speak(text) {
     utterance.volume = 1;
 
     utterance.onstart = function() {
+
         statusText.textContent =
             "🔊 Sushree is speaking...";
+
         character.classList.add("speaking");
+
+        // 🔴 Change microphone to STOP while speaking
+        button.textContent = "⏹";
+        button.classList.add("stop-mode");
+        button.setAttribute("aria-label", "Stop");
+
     };
 
     utterance.onend = function() {
+
         statusText.textContent =
             "Ready to listen";
+
         character.classList.remove("speaking");
+
+        // 🎙️ Restore microphone after speaking
+        button.textContent = "🎙️";
+        button.classList.remove("stop-mode");
+        button.setAttribute("aria-label", "Speak");
+
     };
 
     speechSynthesis.speak(utterance);
