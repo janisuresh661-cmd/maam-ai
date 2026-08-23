@@ -340,24 +340,19 @@ let history = [];
 function composerAction() {
   const button = document.getElementById("composerButton");
 
-  // If listening or speaking, stop everything
+  // Stop listening or speaking
   if (recognition || speechSynthesis.speaking) {
     stopEverything();
-
-    button.textContent = "🎙️";
-    button.classList.remove("stop-mode");
-    button.setAttribute("aria-label", "Speak");
-
     return;
   }
 
-  // If there is text, send it
+  // Send typed message
   if (input.value.trim()) {
     sendText();
     return;
   }
 
-  // Otherwise start listening
+  // Otherwise start microphone
   listen();
 
   button.textContent = "⏹";
@@ -500,7 +495,27 @@ function sendText() {
   processMessage(text);
 }
 
+function updateComposerButton() {
+  const button = document.getElementById("composerButton");
 
+  // Don't change the button while listening or speaking
+  if (recognition || speechSynthesis.speaking) {
+    return;
+  }
+
+  if (input.value.trim()) {
+    button.textContent = "➤";
+    button.classList.remove("stop-mode");
+    button.setAttribute("aria-label", "Send");
+  } else {
+    button.textContent = "🎙️";
+    button.classList.remove("stop-mode");
+    button.setAttribute("aria-label", "Speak");
+  }
+}
+
+input.addEventListener("input", updateComposerButton);
+  
 /* ---------------------------
    TEMPORARY RESPONSE ENGINE
 --------------------------- */
