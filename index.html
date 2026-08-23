@@ -629,9 +629,10 @@ function speak(text) {
         character.classList.add("speaking");
 
         // 🔴 Change microphone to STOP while speaking
-        button.textContent = "⏹";
-        button.classList.add("stop-mode");
-        button.setAttribute("aria-label", "Stop");
+        const speakButton = document.getElementById("composerButton");
+speakButton.textContent = "⏹️";
+speakButton.classList.add("stop-mode");
+speakButton.setAttribute("aria-label", "Stop");
 
     };
 
@@ -643,10 +644,10 @@ function speak(text) {
         character.classList.remove("speaking");
 
         // 🎙️ Restore microphone after speaking
-        button.textContent = "🎙️";
-        button.classList.remove("stop-mode");
-        button.setAttribute("aria-label", "Speak");
-
+        const speakButton = document.getElementById("composerButton");
+speakButton.textContent = "🎙️";
+speakButton.classList.remove("stop-mode");
+speakButton.setAttribute("aria-label", "Speak");
     };
 
     speechSynthesis.speak(utterance);
