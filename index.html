@@ -337,6 +337,20 @@ const character = document.getElementById("character");
 
 let recognition = null;
 let history = [];
+
+// Sushree's local memory
+let memory = JSON.parse(
+  localStorage.getItem("sushreeMemory") || "{}"
+);
+  function saveMemory() {
+  localStorage.setItem("sushreeMemory", JSON.stringify(memory));
+}
+
+function remember(key, value) {
+  memory[key] = value;
+  saveMemory();
+}
+  
 function composerAction() {
   const button = document.getElementById("composerButton");
 
@@ -522,6 +536,20 @@ input.addEventListener("input", updateComposerButton);
 
 async function processMessage(text) {
   statusText.textContent = "🧠 Thinking...";
+  // 🧠 Remember user's name
+const nameMatch = text.match(
+  /\b(?:my name is|i am|i'm|call me)\s+([A-Za-z][A-Za-z\s'-]{0,30})/i
+);
+
+if (nameMatch) {
+  const name = nameMatch[1].trim();
+  remember("name", name);
+}
+
+// 🧠 Give Sushree access to saved memory
+const memoryContext = Object.keys(memory).length
+  ? `Known information about the user: ${JSON.stringify(memory)}`
+  : "No saved information about the user yet.";
 
   try {
     const response = await fetch(
@@ -532,8 +560,8 @@ async function processMessage(text) {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-    message: text,
-    history: history
+  message: `${memoryContext}\n\nUser's message: ${text}`,
+  history: history
 })
       }
     );
