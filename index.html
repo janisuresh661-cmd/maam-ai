@@ -729,47 +729,164 @@ function pcmBase64ToWavBlob(
     bitsPerSample
 ) {
     const binary = atob(base64);
-    const pcmLength = binary.length;
-    const buffer = new ArrayBuffer(44 + pcmLength);
-    const view = new DataView(buffer);
+/* =========================
+   GEMINI TTS — ZEPHYR
+   ========================= */
 
-    function writeString(offset, value) {
-        for (let i = 0; i < value.length; i++) {
-            view.setUint8(offset + i, value.charCodeAt(i));
-        }
+const WORKER_URL =
+  "https://spring-cake-3e86.janisuresh661.workers.dev";
+
+let currentAudio = null;
+
+
+/* Convert Base64 PCM audio returned by Gemini
+   into a WAV file that the browser can play */
+function base64ToWav(base64, sampleRate = 24000) {
+
+  const binary = atob(base64);
+  const pcm = new Uint8Array(binary.length);
+
+  for (let i = 0; i < binary.length; i++) {
+    pcm[i] = binary.charCodeAt(i);
+  }
+
+  const dataLength = pcm.length;
+  const buffer = new ArrayBuffer(44 + dataLength);
+  const view = new DataView(buffer);
+
+  function writeString(offset, string) {
+    for (let i = 0; i < string.length; i++) {
+      view.setUint8(offset + i, string.charCodeAt(i));
+    }
+  }
+
+  // WAV header
+  writeString(0, "RIFF");
+  view.setUint32(4, 36 + dataLength, true);
+  writeString(8, "WAVE");
+
+  writeString(12, "fmt ");
+  view.setUint32(16, 16, true);       // PCM chunk size
+  view.setUint16(20, 1, true);        // PCM format
+  view.setUint16(22, 1, true);        // Mono
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);       // 16-bit
+
+  writeString(36, "data");
+  view.setUint32(40, dataLength, true);
+
+  // PCM data
+  new Uint8Array(buffer, 44).set(pcm);
+
+  return new Blob([buffer], {
+    type: "audio/wav"
+  });
+}
+
+
+async function speak(text) {
+
+  if (!text || !text.trim()) return;
+
+  try {
+
+    // Stop any previous audio
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      currentAudio = null;
     }
 
-    writeString(0, "RIFF");
-    view.setUint32(4, 36 + pcmLength, true);
-    writeString(8, "WAVE");
-    writeString(12, "fmt ");
-    view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true);
-    view.setUint16(22, channels, true);
-    view.setUint32(24, sampleRate, true);
-    view.setUint32(
-        28,
-        sampleRate * channels * bitsPerSample / 8,
-        true
-    );
-    view.setUint16(
-        32,
-        channels * bitsPerSample / 8,
-        true
-    );
-    view.setUint16(34, bitsPerSample, true);
-    writeString(36, "data");
-    view.setUint32(40, pcmLength, true);
+    statusText.textContent = "🔊 Sushree is preparing to speak...";
 
-    const output = new Uint8Array(buffer);
+    character.classList.add("speaking");
 
-    for (let i = 0; i < pcmLength; i++) {
-        output[44 + i] = binary.charCodeAt(i);
-    }
+    const response = await fetch(WORKER_URL, {
+      method: "POST",
 
-    return new Blob([output], {
-        type: "audio/wav"
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        action: "tts",
+        message: text,
+        voice: "Zephyr"
+      })
     });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      console.error("TTS error:", data);
+
+      statusText.textContent = "⚠️ Voice error";
+
+      character.classList.remove("speaking");
+
+      return;
+    }
+
+    if (!data.audio) {
+      console.error("No audio returned:", data);
+
+      statusText.textContent = "⚠️ No audio received";
+
+      character.classList.remove("speaking");
+
+      return;
+    }
+
+    // Gemini returns raw PCM (audio/L16)
+    const wavBlob = base64ToWav(
+      data.audio,
+      24000
+    );
+
+    const audioURL = URL.createObjectURL(wavBlob);
+
+    currentAudio = new Audio(audioURL);
+
+    currentAudio.onplay = function() {
+      statusText.textContent = "🔊 Sushree is speaking...";
+    };
+
+    currentAudio.onended = function() {
+
+      statusText.textContent = "Ready to listen";
+
+      character.classList.remove("speaking");
+
+      URL.revokeObjectURL(audioURL);
+
+      currentAudio = null;
+    };
+
+    currentAudio.onerror = function(error) {
+
+      console.error("Audio playback error:", error);
+
+      statusText.textContent = "⚠️ Audio playback error";
+
+      character.classList.remove("speaking");
+
+      URL.revokeObjectURL(audioURL);
+
+      currentAudio = null;
+    };
+
+    await currentAudio.play();
+
+  } catch (error) {
+
+    console.error("TTS error:", error);
+
+    statusText.textContent = "⚠️ Could not play Sushree's voice";
+
+    character.classList.remove("speaking");
+  }
 }
 
 /* ---------------------------
@@ -793,6 +910,11 @@ button.classList.remove("stop-mode");
 button.setAttribute("aria-label", "Speak");
 
   speechSynthesis.cancel();
+  if (currentAudio) {
+  currentAudio.pause();
+  currentAudio.currentTime = 0;
+  currentAudio = null;
+  }
 
   character.classList.remove("listening");
 
