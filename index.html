@@ -622,87 +622,154 @@ if (data.success && data.reply) {
    TEXT TO SPEECH
 --------------------------- */
 
-function speak(text) {
-    if (!("speechSynthesis" in window)) {
-        statusText.textContent = "Speech not supported.";
-        return;
-    }
-
-    speechSynthesis.cancel();
+async function speak(text) {
+    const WORKER_URL =
+        "https://spring-cake-3e86.janisuresh661.workers.dev";
 
     const button = document.getElementById("composerButton");
 
-    // Remove emojis before speaking
-    const cleanText = text
-        .replace(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/gu, "")
-        .replace(/\s+/g, " ")
-        .trim();
+    try {
+        if ("speechSynthesis" in window) {
+            speechSynthesis.cancel();
+        }
 
-    if (!cleanText) return;
+        const cleanText = text
+            .replace(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/gu, "")
+            .replace(/\s+/g, " ")
+            .trim();
 
-    const utterance = new SpeechSynthesisUtterance(cleanText);
+        if (!cleanText) return;
 
-    utterance.lang = "en-IN";
-    utterance.rate = 0.95;
-    utterance.pitch = 1.05;
-    utterance.volume = 1;
-
-    // Choose an Indian English female voice when available
-    const voices = speechSynthesis.getVoices();
-
-    const preferredVoice =
-        voices.find(v =>
-            /en-IN/i.test(v.lang) &&
-            /female|woman|google.*english/i.test(v.name)
-        ) ||
-        voices.find(v => /en-IN/i.test(v.lang)) ||
-        voices.find(v =>
-            /en-US|en-GB/i.test(v.lang) &&
-            /female|woman|google.*english/i.test(v.name)
-        ) ||
-        voices.find(v => /en-US|en-GB/i.test(v.lang));
-
-    if (preferredVoice) {
-        utterance.voice = preferredVoice;
-    }
-
-    utterance.onstart = function () {
         statusText.textContent = "🔊 Sushree is speaking...";
         character.classList.add("speaking");
 
-        const speakButton =
-            document.getElementById("composerButton");
+        if (button) {
+            button.textContent = "⏹️";
+            button.classList.add("stop-mode");
+            button.setAttribute("aria-label", "Stop");
+        }
 
-        speakButton.textContent = "⏹️";
-        speakButton.classList.add("stop-mode");
-        speakButton.setAttribute("aria-label", "Stop");
-    };
+        const response = await fetch(WORKER_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                action: "tts",
+                message: cleanText,
+                voice: "Zephyr"
+            })
+        });
 
-    utterance.onend = function () {
-        statusText.textContent = "Ready to listen";
+        const data = await response.json();
+
+        if (!response.ok || !data.success || !data.audio) {
+            throw new Error(
+                data.error || "TTS audio was not returned."
+            );
+        }
+
+        const wavBlob = pcmBase64ToWavBlob(
+            data.audio,
+            24000,
+            1,
+            16
+        );
+
+        const audioUrl = URL.createObjectURL(wavBlob);
+        const audio = new Audio(audioUrl);
+
+        window.sushreeAudio = audio;
+
+        audio.onended = function () {
+            URL.revokeObjectURL(audioUrl);
+            window.sushreeAudio = null;
+            statusText.textContent = "Ready to listen";
+            character.classList.remove("speaking");
+
+            if (button) {
+                button.textContent = "🎙️";
+                button.classList.remove("stop-mode");
+                button.setAttribute("aria-label", "Speak");
+            }
+        };
+
+        audio.onerror = function () {
+            URL.revokeObjectURL(audioUrl);
+            window.sushreeAudio = null;
+            statusText.textContent = "Ready to listen";
+            character.classList.remove("speaking");
+
+            if (button) {
+                button.textContent = "🎙️";
+                button.classList.remove("stop-mode");
+                button.setAttribute("aria-label", "Speak");
+            }
+        };
+
+        await audio.play();
+
+    } catch (error) {
+        console.error("Sushree TTS error:", error);
+        statusText.textContent = "Voice unavailable";
         character.classList.remove("speaking");
 
-        const speakButton =
-            document.getElementById("composerButton");
+        if (button) {
+            button.textContent = "🎙️";
+            button.classList.remove("stop-mode");
+            button.setAttribute("aria-label", "Speak");
+        }
+    }
+}
 
-        speakButton.textContent = "🎙️";
-        speakButton.classList.remove("stop-mode");
-        speakButton.setAttribute("aria-label", "Speak");
-    };
+function pcmBase64ToWavBlob(
+    base64,
+    sampleRate,
+    channels,
+    bitsPerSample
+) {
+    const binary = atob(base64);
+    const pcmLength = binary.length;
+    const buffer = new ArrayBuffer(44 + pcmLength);
+    const view = new DataView(buffer);
 
-    utterance.onerror = function () {
-        statusText.textContent = "Ready to listen";
-        character.classList.remove("speaking");
+    function writeString(offset, value) {
+        for (let i = 0; i < value.length; i++) {
+            view.setUint8(offset + i, value.charCodeAt(i));
+        }
+    }
 
-        const speakButton =
-            document.getElementById("composerButton");
+    writeString(0, "RIFF");
+    view.setUint32(4, 36 + pcmLength, true);
+    writeString(8, "WAVE");
+    writeString(12, "fmt ");
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, channels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(
+        28,
+        sampleRate * channels * bitsPerSample / 8,
+        true
+    );
+    view.setUint16(
+        32,
+        channels * bitsPerSample / 8,
+        true
+    );
+    view.setUint16(34, bitsPerSample, true);
+    writeString(36, "data");
+    view.setUint32(40, pcmLength, true);
 
-        speakButton.textContent = "🎙️";
-        speakButton.classList.remove("stop-mode");
-        speakButton.setAttribute("aria-label", "Speak");
-    };
+    const output = new Uint8Array(buffer);
 
-    speechSynthesis.speak(utterance);
+    for (let i = 0; i < pcmLength; i++) {
+        output[44 + i] = binary.charCodeAt(i);
+    }
+
+    return new Blob([output], {
+        type: "audio/wav"
+    });
 }
 
 /* ---------------------------
