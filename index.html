@@ -804,141 +804,880 @@ async function speak(text) {
     character.classList.add("speaking");
 
     const response = await fetch(WORKER_URL, {
-      method: "POST",
+<script>
 
-      headers: {
-        "Content-Type": "application/json"
-      },
+const input = document.getElementById("input");
+const chat = document.getElementById("chat");
+const statusText = document.getElementById("status");
+const character = document.getElementById("character");
+const button = document.getElementById("composerButton");
 
-      body: JSON.stringify({
-        action: "tts",
-        message: text,
-        voice: "Zephyr"
-      })
-    });
+const WORKER_URL =
+  "https://spring-cake-3e86.janisuresh661.workers.dev";
 
-    const data = await response.json();
+let recognition = null;
+let history = [];
+let currentAudio = null;
 
-    if (!response.ok || !data.success) {
-      console.error("TTS error:", data);
+/* ---------------------------
+   LOCAL MEMORY
+--------------------------- */
 
-      statusText.textContent = "⚠️ Voice error";
+let memory = JSON.parse(
+  localStorage.getItem("sushreeMemory") || "{}"
+);
 
-      character.classList.remove("speaking");
+function saveMemory() {
+  localStorage.setItem(
+    "sushreeMemory",
+    JSON.stringify(memory)
+  );
+}
 
-      return;
-    }
+function remember(key, value) {
+  memory[key] = value;
+  saveMemory();
+}
 
-    if (!data.audio) {
-      console.error("No audio returned:", data);
 
-      statusText.textContent = "⚠️ No audio received";
+/* ---------------------------
+   COMPOSER BUTTON
+--------------------------- */
 
-      character.classList.remove("speaking");
+function composerAction() {
 
-      return;
-    }
+  // Stop current voice/listening
+  if (recognition || currentAudio) {
+    stopEverything();
+    return;
+  }
 
-    // Gemini returns raw PCM (audio/L16)
-    const wavBlob = base64ToWav(
-      data.audio,
-      24000
-    );
+  // Send typed message
+  if (input.value.trim()) {
+    sendText();
+    return;
+  }
 
-    const audioURL = URL.createObjectURL(wavBlob);
+  // Otherwise microphone
+  listen();
+}
 
-    currentAudio = new Audio(audioURL);
 
-    currentAudio.onplay = function() {
-      statusText.textContent = "🔊 Sushree is speaking...";
-    };
+/* ---------------------------
+   COMPOSER BUTTON UPDATE
+--------------------------- */
 
-    currentAudio.onended = function() {
+function updateComposerButton() {
 
-      statusText.textContent = "Ready to listen";
+  // Don't change button while active
+  if (recognition || currentAudio) {
+    return;
+  }
 
-      character.classList.remove("speaking");
+  if (input.value.trim()) {
 
-      URL.revokeObjectURL(audioURL);
+    button.textContent = "➤";
+    button.classList.remove("stop-mode");
+    button.setAttribute("aria-label", "Send");
 
-      currentAudio = null;
-    };
+  } else {
 
-    currentAudio.onerror = function(error) {
+    button.textContent = "🎙️";
+    button.classList.remove("stop-mode");
+    button.setAttribute("aria-label", "Speak");
 
-      console.error("Audio playback error:", error);
-
-      statusText.textContent = "⚠️ Audio playback error";
-
-      character.classList.remove("speaking");
-
-      URL.revokeObjectURL(audioURL);
-
-      currentAudio = null;
-    };
-
-    await currentAudio.play();
-
-  } catch (error) {
-
-    console.error("TTS error:", error);
-
-    statusText.textContent = "⚠️ Could not play Sushree's voice";
-
-    character.classList.remove("speaking");
   }
 }
 
+input.addEventListener(
+  "input",
+  updateComposerButton
+);
+
+
 /* ---------------------------
-   STOP
+   ADD MESSAGE
+--------------------------- */
+
+function addMessage(text, type) {
+
+  const message = document.createElement("div");
+
+  message.className =
+    "message " + type;
+
+  message.innerHTML = String(text)
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/^### (.*)$/gm, "<h3>$1</h3>")
+    .replace(/^## (.*)$/gm, "<h2>$1</h2>")
+    .replace(/^# (.*)$/gm, "<h1>$1</h1>")
+    .replace(/\n/g, "<br>");
+
+  chat.appendChild(message);
+
+  chat.scrollTop = chat.scrollHeight;
+}
+
+
+/* ---------------------------
+   SPEECH RECOGNITION
+--------------------------- */
+
+function listen() {
+
+  const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+
+    statusText.textContent =
+      "Speech recognition isn't supported here.";
+
+    return;
+  }
+
+  recognition =
+    new SpeechRecognition();
+
+  recognition.lang = "en-IN";
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  recognition.onstart = function() {
+
+    statusText.textContent =
+      "🎙️ Listening...";
+
+    character.classList.add("listening");
+
+    button.textContent = "⏹";
+    button.classList.add("stop-mode");
+    button.setAttribute("aria-label", "Stop");
+  };
+
+
+  recognition.onresult = function(event) {
+
+    const text =
+      event.results[0][0].transcript;
+
+    input.value = "";
+
+    updateComposerButton();
+
+    addMessage(text, "user");
+
+    processMessage(text);
+  };
+
+
+  recognition.onerror = function(event) {
+
+    console.error(
+      "Speech recognition error:",
+      event
+    );
+
+    character.classList.remove("listening");
+
+    recognition = null;
+
+    statusText.textContent =
+      "I couldn't hear that. Try again.";
+
+    updateComposerButton();
+  };
+
+
+  recognition.onend = function() {
+
+    character.classList.remove("listening");
+
+    recognition = null;
+
+    updateComposerButton();
+
+    if (!currentAudio) {
+      statusText.textContent =
+        "Ready to listen";
+    }
+  };
+
+
+  try {
+
+    recognition.start();
+
+  } catch (error) {
+
+    console.error(
+      "Recognition start error:",
+      error
+    );
+
+    recognition = null;
+
+    updateComposerButton();
+  }
+}
+
+
+/* ---------------------------
+   SEND TEXT
+--------------------------- */
+
+function sendText() {
+
+  const text =
+    input.value.trim();
+
+  if (!text) return;
+
+  input.value = "";
+
+  updateComposerButton();
+
+  addMessage(
+    text,
+    "user"
+  );
+
+  processMessage(text);
+}
+
+
+/* ---------------------------
+   AI PROCESSING
+--------------------------- */
+
+async function processMessage(text) {
+
+  statusText.textContent =
+    "🧠 Thinking...";
+
+  character.classList.add("thinking");
+
+
+  /* Remember name */
+
+  const nameMatch =
+    text.match(
+      /\b(?:my name is|i am|i'm|call me)\s+([A-Za-z][A-Za-z\s'-]{0,30})/i
+    );
+
+  if (nameMatch) {
+
+    const name =
+      nameMatch[1].trim();
+
+    remember(
+      "name",
+      name
+    );
+  }
+
+
+  /* Memory context */
+
+  const memoryContext =
+    Object.keys(memory).length
+      ? `Known information about the user: ${JSON.stringify(memory)}`
+      : "No saved information about the user yet.";
+
+
+  try {
+
+    const response =
+      await fetch(
+        WORKER_URL,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+
+            message:
+              `${memoryContext}\n\nUser's message: ${text}`,
+
+            history:
+              history
+
+          })
+        }
+      );
+
+
+    const raw =
+      await response.text();
+
+    let data;
+
+
+    try {
+
+      data =
+        JSON.parse(raw);
+
+    } catch (error) {
+
+      console.error(
+        "Invalid JSON from Worker:",
+        raw
+      );
+
+      throw new Error(
+        "Worker returned an invalid response."
+      );
+    }
+
+
+    console.log(
+      "Worker response:",
+      data
+    );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        data.error ||
+        `Worker returned HTTP ${response.status}`
+      );
+    }
+
+
+    if (
+      data.success &&
+      data.reply
+    ) {
+
+      history.push({
+        role: "user",
+        parts: [
+          {
+            text: text
+          }
+        ]
+      });
+
+
+      history.push({
+        role: "model",
+        parts: [
+          {
+            text: data.reply
+          }
+        ]
+      });
+
+
+      addMessage(
+        data.reply,
+        "assistant"
+      );
+
+
+      character.classList.remove(
+        "thinking"
+      );
+
+      await speak(
+        data.reply
+      );
+
+    } else {
+
+      addMessage(
+        data.error ||
+        "Sorry, I couldn't get a response right now.",
+        "assistant"
+      );
+
+      character.classList.remove(
+        "thinking"
+      );
+    }
+
+
+  } catch (error) {
+
+    console.error(
+      "Sushree API Error:",
+      error
+    );
+
+
+    character.classList.remove(
+      "thinking"
+    );
+
+
+    addMessage(
+      `Sorry, something went wrong: ${error.message}`,
+      "assistant"
+    );
+  }
+
+
+  if (!currentAudio) {
+
+    statusText.textContent =
+      "🟢 Online";
+
+  }
+}
+
+
+/* ---------------------------
+   PCM BASE64 → WAV
+--------------------------- */
+
+function base64ToWav(
+  base64,
+  sampleRate = 24000
+) {
+
+  const binary =
+    atob(base64);
+
+  const pcm =
+    new Uint8Array(
+      binary.length
+    );
+
+
+  for (
+    let i = 0;
+    i < binary.length;
+    i++
+  ) {
+
+    pcm[i] =
+      binary.charCodeAt(i);
+  }
+
+
+  const dataLength =
+    pcm.length;
+
+  const buffer =
+    new ArrayBuffer(
+      44 + dataLength
+    );
+
+  const view =
+    new DataView(buffer);
+
+
+  function writeString(
+    offset,
+    string
+  ) {
+
+    for (
+      let i = 0;
+      i < string.length;
+      i++
+    ) {
+
+      view.setUint8(
+        offset + i,
+        string.charCodeAt(i)
+      );
+    }
+  }
+
+
+  /* WAV header */
+
+  writeString(
+    0,
+    "RIFF"
+  );
+
+  view.setUint32(
+    4,
+    36 + dataLength,
+    true
+  );
+
+  writeString(
+    8,
+    "WAVE"
+  );
+
+
+  writeString(
+    12,
+    "fmt "
+  );
+
+  view.setUint32(
+    16,
+    16,
+    true
+  );
+
+  view.setUint16(
+    20,
+    1,
+    true
+  );
+
+  view.setUint16(
+    22,
+    1,
+    true
+  );
+
+  view.setUint32(
+    24,
+    sampleRate,
+    true
+  );
+
+  view.setUint32(
+    28,
+    sampleRate * 2,
+    true
+  );
+
+  view.setUint16(
+    32,
+    2,
+    true
+  );
+
+  view.setUint16(
+    34,
+    16,
+    true
+  );
+
+
+  writeString(
+    36,
+    "data"
+  );
+
+  view.setUint32(
+    40,
+    dataLength,
+    true
+  );
+
+
+  new Uint8Array(
+    buffer,
+    44
+  ).set(pcm);
+
+
+  return new Blob(
+    [buffer],
+    {
+      type: "audio/wav"
+    }
+  );
+}
+
+
+/* ---------------------------
+   TEXT TO SPEECH
+--------------------------- */
+
+async function speak(text) {
+
+  if (
+    !text ||
+    !text.trim()
+  ) {
+    return;
+  }
+
+
+  try {
+
+    /* Stop previous audio */
+
+    if (currentAudio) {
+
+      currentAudio.pause();
+
+      currentAudio.currentTime =
+        0;
+
+      currentAudio = null;
+    }
+
+
+    statusText.textContent =
+      "🔊 Sushree is preparing to speak...";
+
+
+    character.classList.add(
+      "speaking"
+    );
+
+
+    button.textContent =
+      "⏹️";
+
+    button.classList.add(
+      "stop-mode"
+    );
+
+    button.setAttribute(
+      "aria-label",
+      "Stop"
+    );
+
+
+    const response =
+      await fetch(
+        WORKER_URL,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+
+            action: "tts",
+
+            message: text,
+
+            voice: "Zephyr"
+
+          })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (
+      !response.ok ||
+      !data.success ||
+      !data.audio
+    ) {
+
+      console.error(
+        "TTS error:",
+        data
+      );
+
+      throw new Error(
+        data.error ||
+        "TTS audio was not returned."
+      );
+    }
+
+
+    /* Gemini returns raw PCM */
+
+    const wavBlob =
+      base64ToWav(
+        data.audio,
+        24000
+      );
+
+
+    const audioURL =
+      URL.createObjectURL(
+        wavBlob
+      );
+
+
+    currentAudio =
+      new Audio(audioURL);
+
+
+    currentAudio.onplay =
+      function() {
+
+        statusText.textContent =
+          "🔊 Sushree is speaking...";
+      };
+
+
+    currentAudio.onended =
+      function() {
+
+        statusText.textContent =
+          "Ready to listen";
+
+        character.classList.remove(
+          "speaking"
+        );
+
+        URL.revokeObjectURL(
+          audioURL
+        );
+
+        currentAudio =
+          null;
+
+        updateComposerButton();
+      };
+
+
+    currentAudio.onerror =
+      function(error) {
+
+        console.error(
+          "Audio playback error:",
+          error
+        );
+
+        statusText.textContent =
+          "⚠️ Audio playback error";
+
+        character.classList.remove(
+          "speaking"
+        );
+
+        URL.revokeObjectURL(
+          audioURL
+        );
+
+        currentAudio =
+          null;
+
+        updateComposerButton();
+      };
+
+
+    await currentAudio.play();
+
+
+  } catch (error) {
+
+    console.error(
+      "Sushree TTS error:",
+      error
+    );
+
+
+    statusText.textContent =
+      "⚠️ Voice unavailable";
+
+    character.classList.remove(
+      "speaking"
+    );
+
+
+    currentAudio =
+      null;
+
+    updateComposerButton();
+  }
+}
+
+
+/* ---------------------------
+   STOP EVERYTHING
 --------------------------- */
 
 function stopEverything() {
 
+  /* Stop microphone */
+
   if (recognition) {
 
     try {
+
       recognition.stop();
-    } catch(error) {}
+
+    } catch (error) {}
+
   }
-  recognition = null;
 
-const button = document.getElementById("composerButton");
+  recognition =
+    null;
 
-button.textContent = "🎙️";
-button.classList.remove("stop-mode");
-button.setAttribute("aria-label", "Speak");
 
-  speechSynthesis.cancel();
+  /* Stop TTS */
+
   if (currentAudio) {
-  currentAudio.pause();
-  currentAudio.currentTime = 0;
-  currentAudio = null;
+
+    currentAudio.pause();
+
+    currentAudio.currentTime =
+      0;
+
+    currentAudio =
+      null;
   }
 
-  character.classList.remove("listening");
 
-  character.classList.remove("speaking");
+  /* Stop browser speech synthesis
+     just in case */
+
+  if (
+    "speechSynthesis" in window
+  ) {
+
+    speechSynthesis.cancel();
+  }
+
+
+  character.classList.remove(
+    "listening"
+  );
+
+  character.classList.remove(
+    "thinking"
+  );
+
+  character.classList.remove(
+    "speaking"
+  );
+
 
   statusText.textContent =
     "Ready to listen";
+
+
+  updateComposerButton();
 }
 
 
-/* ENTER KEY */
+/* ---------------------------
+   ENTER KEY
+--------------------------- */
 
 input.addEventListener(
   "keydown",
   function(event) {
 
-    if (event.key === "Enter") {
+    if (
+      event.key === "Enter"
+    ) {
+
+      event.preventDefault();
 
       sendText();
-
     }
-
   }
 );
+
+
+/* ---------------------------
+   INITIAL STATE
+--------------------------- */
+
+updateComposerButton();
 
 </script>
 
