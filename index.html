@@ -623,7 +623,6 @@ if (data.success && data.reply) {
 --------------------------- */
 
 function speak(text) {
-
     if (!("speechSynthesis" in window)) {
         statusText.textContent = "Speech not supported.";
         return;
@@ -635,47 +634,72 @@ function speak(text) {
 
     // Remove emojis before speaking
     const cleanText = text
-        .replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "")
+        .replace(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/gu, "")
         .replace(/\s+/g, " ")
         .trim();
 
     if (!cleanText) return;
 
-    const utterance =
-        new SpeechSynthesisUtterance(cleanText);
+    const utterance = new SpeechSynthesisUtterance(cleanText);
 
     utterance.lang = "en-IN";
     utterance.rate = 0.95;
     utterance.pitch = 1.05;
     utterance.volume = 1;
 
-    utterance.onstart = function() {
+    // Choose an Indian English female voice when available
+    const voices = speechSynthesis.getVoices();
 
-        statusText.textContent =
-            "🔊 Sushree is speaking...";
+    const preferredVoice =
+        voices.find(v =>
+            /en-IN/i.test(v.lang) &&
+            /female|woman|google.*english/i.test(v.name)
+        ) ||
+        voices.find(v => /en-IN/i.test(v.lang)) ||
+        voices.find(v =>
+            /en-US|en-GB/i.test(v.lang) &&
+            /female|woman|google.*english/i.test(v.name)
+        ) ||
+        voices.find(v => /en-US|en-GB/i.test(v.lang));
 
+    if (preferredVoice) {
+        utterance.voice = preferredVoice;
+    }
+
+    utterance.onstart = function () {
+        statusText.textContent = "🔊 Sushree is speaking...";
         character.classList.add("speaking");
 
-        // 🔴 Change microphone to STOP while speaking
-        const speakButton = document.getElementById("composerButton");
-speakButton.textContent = "⏹️";
-speakButton.classList.add("stop-mode");
-speakButton.setAttribute("aria-label", "Stop");
+        const speakButton =
+            document.getElementById("composerButton");
 
+        speakButton.textContent = "⏹️";
+        speakButton.classList.add("stop-mode");
+        speakButton.setAttribute("aria-label", "Stop");
     };
 
-    utterance.onend = function() {
-
-        statusText.textContent =
-            "Ready to listen";
-
+    utterance.onend = function () {
+        statusText.textContent = "Ready to listen";
         character.classList.remove("speaking");
 
-        // 🎙️ Restore microphone after speaking
-        const speakButton = document.getElementById("composerButton");
-speakButton.textContent = "🎙️";
-speakButton.classList.remove("stop-mode");
-speakButton.setAttribute("aria-label", "Speak");
+        const speakButton =
+            document.getElementById("composerButton");
+
+        speakButton.textContent = "🎙️";
+        speakButton.classList.remove("stop-mode");
+        speakButton.setAttribute("aria-label", "Speak");
+    };
+
+    utterance.onerror = function () {
+        statusText.textContent = "Ready to listen";
+        character.classList.remove("speaking");
+
+        const speakButton =
+            document.getElementById("composerButton");
+
+        speakButton.textContent = "🎙️";
+        speakButton.classList.remove("stop-mode");
+        speakButton.setAttribute("aria-label", "Speak");
     };
 
     speechSynthesis.speak(utterance);
