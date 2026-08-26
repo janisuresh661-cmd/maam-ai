@@ -330,481 +330,13 @@ body {
 
 <script>
 
-const input = document.getElementById("input");
-const chat = document.getElementById("chat");
-const statusText = document.getElementById("status");
-const character = document.getElementById("character");
-
-let recognition = null;
-let history = [];
-
-// Sushree's local memory
-let memory = JSON.parse(
-  localStorage.getItem("sushreeMemory") || "{}"
-);
-  function saveMemory() {
-  localStorage.setItem("sushreeMemory", JSON.stringify(memory));
-}
-
-function remember(key, value) {
-  memory[key] = value;
-  saveMemory();
-}
-  
-function composerAction() {
-  const button = document.getElementById("composerButton");
-
-  // Stop listening or speaking
-  if (recognition || speechSynthesis.speaking) {
-    stopEverything();
-    return;
-  }
-
-  // Send typed message
-  if (input.value.trim()) {
-    sendText();
-    return;
-  }
-
-  // Otherwise start microphone
-  listen();
-
-  button.textContent = "⏹";
-  button.classList.add("stop-mode");
-  button.setAttribute("aria-label", "Stop");
-}
+/* =========================================================
+   SUSHREE AI — COMPLETE SCRIPT
+   ========================================================= */
 
 /* ---------------------------
-   ADD MESSAGE
+   ELEMENTS
 --------------------------- */
-
-function addMessage(text, type) {
-
-  const message = document.createElement("div");
-
-  message.className = "message " + type;
-
-  message.innerHTML = text
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-    .replace(/^### (.*)$/gm, "<h3>$1</h3>")
-    .replace(/^## (.*)$/gm, "<h2>$1</h2>")
-    .replace(/^# (.*)$/gm, "<h1>$1</h1>")
-    .replace(/\n/g, "<br>");
-
-  chat.appendChild(message);
-
-  chat.scrollTop = chat.scrollHeight;
-}
-
-
-/* ---------------------------
-   SPEECH RECOGNITION
---------------------------- */
-
-function listen() {
-
-  const SpeechRecognition =
-    window.SpeechRecognition ||
-    window.webkitSpeechRecognition;
-
-  if (!SpeechRecognition) {
-
-    statusText.textContent =
-      "Speech recognition isn't supported here.";
-
-    return;
-  }
-
-  recognition = new SpeechRecognition();
-
-  /*
-    We begin with English-India.
-    Later, the real AI backend will
-    handle automatic multilingual
-    understanding.
-  */
-
-  recognition.lang = "en-IN";
-
-  recognition.continuous = false;
-
-  recognition.interimResults = false;
-
-  recognition.onstart = function() {
-
-    statusText.textContent =
-      "🎙️ Listening...";
-
-    character.classList.add("listening");
-  };
-
-  recognition.onresult = function(event) {
-
-    const text =
-      event.results[0][0].transcript;
-
-    character.classList.remove("listening");
-
-    input.value = "";
-
-    addMessage(text, "user");
-
-    processMessage(text);
-  };
-
-  recognition.onerror = function() {
-
-  character.classList.remove("listening");
-
-  recognition = null;
-
-  statusText.textContent =
-    "I couldn't hear that. Try again.";
-
-  const button = document.getElementById("composerButton");
-
-  button.textContent = "🎙️";
-  button.classList.remove("stop-mode");
-  button.setAttribute("aria-label", "Speak");
-};
-
-  recognition.onend = function() {
-
-  character.classList.remove("listening");
-
-  recognition = null;
-
-  const button = document.getElementById("composerButton");
-
-  button.textContent = "🎙️";
-  button.classList.remove("stop-mode");
-  button.setAttribute("aria-label", "Speak");
-};
-
-  try {
-
-    recognition.start();
-
-  } catch(error) {
-
-    console.log(error);
-  }
-}
-
-
-/* ---------------------------
-   TEXT MESSAGE
---------------------------- */
-
-function sendText() {
-
-  const text = input.value.trim();
-
-  if (!text) return;
-
-  input.value = "";
-
-  addMessage(text, "user");
-
-  processMessage(text);
-}
-
-function updateComposerButton() {
-  const button = document.getElementById("composerButton");
-
-  // Don't change the button while listening or speaking
-  if (recognition || speechSynthesis.speaking) {
-    return;
-  }
-
-  if (input.value.trim()) {
-    button.textContent = "➤";
-    button.classList.remove("stop-mode");
-    button.setAttribute("aria-label", "Send");
-  } else {
-    button.textContent = "🎙️";
-    button.classList.remove("stop-mode");
-    button.setAttribute("aria-label", "Speak");
-  }
-}
-
-input.addEventListener("input", updateComposerButton);
-  
-/* ---------------------------
-   TEMPORARY RESPONSE ENGINE
---------------------------- */
-
-async function processMessage(text) {
-  statusText.textContent = "🧠 Thinking...";
-  // 🧠 Remember user's name
-const nameMatch = text.match(
-  /\b(?:my name is|i am|i'm|call me)\s+([A-Za-z][A-Za-z\s'-]{0,30})/i
-);
-
-if (nameMatch) {
-  const name = nameMatch[1].trim();
-  remember("name", name);
-}
-
-// 🧠 Give Sushree access to saved memory
-const memoryContext = Object.keys(memory).length
-  ? `Known information about the user: ${JSON.stringify(memory)}`
-  : "No saved information about the user yet.";
-
-  try {
-    const response = await fetch(
-      "https://spring-cake-3e86.janisuresh661.workers.dev",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-  message: `${memoryContext}\n\nUser's message: ${text}`,
-  history: history
-})
-      }
-    );
-
-    const raw = await response.text();
-
-    let data;
-
-    try {
-      data = JSON.parse(raw);
-    } catch (e) {
-      console.error("Invalid JSON from Worker:", raw);
-      throw new Error("Worker returned an invalid response.");
-    }
-
-    console.log("Worker response:", data);
-
-    if (!response.ok) {
-    throw new Error(
-        data.details
-            ? JSON.stringify(data.details)
-            : (data.error || `Worker returned HTTP ${response.status}`)
-    );
-}
-
-if (data.success && data.reply) {
-    history.push({
-        role: "user",
-        parts: [{ text: text }]
-    });
-
-    history.push({
-        role: "model",
-        parts: [{ text: data.reply }]
-    });
-
-    addMessage(data.reply, "assistant");
-  speak(data.reply);
-} else {
-      addMessage(
-        data.error || "Sorry, I couldn't get a response right now.",
-        "assistant"
-      );
-    }
-
-  } catch (error) {
-    console.error("Sushree API Error:", error);
-
-    addMessage(
-      `Sorry, something went wrong: ${error.message}`,
-      "assistant"
-    );
-  }
-
-  statusText.textContent = "🟢 Online";
-}
-/* ---------------------------
-   TEXT TO SPEECH
---------------------------- */
-
-async function speak(text) {
-    const WORKER_URL =
-        "https://spring-cake-3e86.janisuresh661.workers.dev";
-
-    const button = document.getElementById("composerButton");
-
-    try {
-        if ("speechSynthesis" in window) {
-            speechSynthesis.cancel();
-        }
-
-        const cleanText = text
-            .replace(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/gu, "")
-            .replace(/\s+/g, " ")
-            .trim();
-
-        if (!cleanText) return;
-
-        statusText.textContent = "🔊 Sushree is speaking...";
-        character.classList.add("speaking");
-
-        if (button) {
-            button.textContent = "⏹️";
-            button.classList.add("stop-mode");
-            button.setAttribute("aria-label", "Stop");
-        }
-
-        const response = await fetch(WORKER_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                action: "tts",
-                message: cleanText,
-                voice: "Zephyr"
-            })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok || !data.success || !data.audio) {
-            throw new Error(
-                data.error || "TTS audio was not returned."
-            );
-        }
-
-        const wavBlob = pcmBase64ToWavBlob(
-            data.audio,
-            24000,
-            1,
-            16
-        );
-
-        const audioUrl = URL.createObjectURL(wavBlob);
-        const audio = new Audio(audioUrl);
-
-        window.sushreeAudio = audio;
-
-        audio.onended = function () {
-            URL.revokeObjectURL(audioUrl);
-            window.sushreeAudio = null;
-            statusText.textContent = "Ready to listen";
-            character.classList.remove("speaking");
-
-            if (button) {
-                button.textContent = "🎙️";
-                button.classList.remove("stop-mode");
-                button.setAttribute("aria-label", "Speak");
-            }
-        };
-
-        audio.onerror = function () {
-            URL.revokeObjectURL(audioUrl);
-            window.sushreeAudio = null;
-            statusText.textContent = "Ready to listen";
-            character.classList.remove("speaking");
-
-            if (button) {
-                button.textContent = "🎙️";
-                button.classList.remove("stop-mode");
-                button.setAttribute("aria-label", "Speak");
-            }
-        };
-
-        await audio.play();
-
-    } catch (error) {
-        console.error("Sushree TTS error:", error);
-        statusText.textContent = "Voice unavailable";
-        character.classList.remove("speaking");
-
-        if (button) {
-            button.textContent = "🎙️";
-            button.classList.remove("stop-mode");
-            button.setAttribute("aria-label", "Speak");
-        }
-    }
-}
-
-function pcmBase64ToWavBlob(
-    base64,
-    sampleRate,
-    channels,
-    bitsPerSample
-) {
-    const binary = atob(base64);
-/* =========================
-   GEMINI TTS — ZEPHYR
-   ========================= */
-
-const WORKER_URL =
-  "https://spring-cake-3e86.janisuresh661.workers.dev";
-
-let currentAudio = null;
-
-
-/* Convert Base64 PCM audio returned by Gemini
-   into a WAV file that the browser can play */
-function base64ToWav(base64, sampleRate = 24000) {
-
-  const binary = atob(base64);
-  const pcm = new Uint8Array(binary.length);
-
-  for (let i = 0; i < binary.length; i++) {
-    pcm[i] = binary.charCodeAt(i);
-  }
-
-  const dataLength = pcm.length;
-  const buffer = new ArrayBuffer(44 + dataLength);
-  const view = new DataView(buffer);
-
-  function writeString(offset, string) {
-    for (let i = 0; i < string.length; i++) {
-      view.setUint8(offset + i, string.charCodeAt(i));
-    }
-  }
-
-  // WAV header
-  writeString(0, "RIFF");
-  view.setUint32(4, 36 + dataLength, true);
-  writeString(8, "WAVE");
-
-  writeString(12, "fmt ");
-  view.setUint32(16, 16, true);       // PCM chunk size
-  view.setUint16(20, 1, true);        // PCM format
-  view.setUint16(22, 1, true);        // Mono
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, sampleRate * 2, true);
-  view.setUint16(32, 2, true);
-  view.setUint16(34, 16, true);       // 16-bit
-
-  writeString(36, "data");
-  view.setUint32(40, dataLength, true);
-
-  // PCM data
-  new Uint8Array(buffer, 44).set(pcm);
-
-  return new Blob([buffer], {
-    type: "audio/wav"
-  });
-}
-
-
-async function speak(text) {
-
-  if (!text || !text.trim()) return;
-
-  try {
-
-    // Stop any previous audio
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
-      currentAudio = null;
-    }
-
-    statusText.textContent = "🔊 Sushree is preparing to speak...";
-
-    character.classList.add("speaking");
-
-    const response = await fetch(WORKER_URL, {
-<script>
 
 const input = document.getElementById("input");
 const chat = document.getElementById("chat");
@@ -812,106 +344,116 @@ const statusText = document.getElementById("status");
 const character = document.getElementById("character");
 const button = document.getElementById("composerButton");
 
+
+/* ---------------------------
+   CONFIGURATION
+--------------------------- */
+
 const WORKER_URL =
   "https://spring-cake-3e86.janisuresh661.workers.dev";
 
+
+/* ---------------------------
+   STATE
+--------------------------- */
+
 let recognition = null;
-let history = [];
 let currentAudio = null;
+let history = [];
+
 
 /* ---------------------------
    LOCAL MEMORY
 --------------------------- */
 
-let memory = JSON.parse(
-  localStorage.getItem("sushreeMemory") || "{}"
-);
+let memory = {};
+
+try {
+
+  memory = JSON.parse(
+    localStorage.getItem("sushreeMemory") || "{}"
+  );
+
+} catch (error) {
+
+  console.error("Memory loading error:", error);
+
+  memory = {};
+
+}
+
 
 function saveMemory() {
-  localStorage.setItem(
-    "sushreeMemory",
-    JSON.stringify(memory)
-  );
+
+  try {
+
+    localStorage.setItem(
+      "sushreeMemory",
+      JSON.stringify(memory)
+    );
+
+  } catch (error) {
+
+    console.error("Memory saving error:", error);
+
+  }
+
 }
+
 
 function remember(key, value) {
+
   memory[key] = value;
+
   saveMemory();
+
 }
 
 
-/* ---------------------------
-   COMPOSER BUTTON
---------------------------- */
-
-function composerAction() {
-
-  // Stop current voice/listening
-  if (recognition || currentAudio) {
-    stopEverything();
-    return;
-  }
-
-  // Send typed message
-  if (input.value.trim()) {
-    sendText();
-    return;
-  }
-
-  // Otherwise microphone
-  listen();
-}
-
-
-/* ---------------------------
-   COMPOSER BUTTON UPDATE
---------------------------- */
-
-function updateComposerButton() {
-
-  // Don't change button while active
-  if (recognition || currentAudio) {
-    return;
-  }
-
-  if (input.value.trim()) {
-
-    button.textContent = "➤";
-    button.classList.remove("stop-mode");
-    button.setAttribute("aria-label", "Send");
-
-  } else {
-
-    button.textContent = "🎙️";
-    button.classList.remove("stop-mode");
-    button.setAttribute("aria-label", "Speak");
-
-  }
-}
-
-input.addEventListener(
-  "input",
-  updateComposerButton
-);
-
-
-/* ---------------------------
-   ADD MESSAGE
---------------------------- */
+/* =========================================================
+   CHAT MESSAGE
+   ========================================================= */
 
 function addMessage(text, type) {
 
   const message = document.createElement("div");
 
-  message.className =
-    "message " + type;
+  message.className = "message " + type;
 
-  message.innerHTML = String(text)
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-    .replace(/^### (.*)$/gm, "<h3>$1</h3>")
-    .replace(/^## (.*)$/gm, "<h2>$1</h2>")
-    .replace(/^# (.*)$/gm, "<h1>$1</h1>")
-    .replace(/\n/g, "<br>");
+  /*
+    Basic formatting:
+    **bold**
+    # heading
+    ## heading
+    ### heading
+    line breaks
+  */
+
+  let formatted = String(text);
+
+  formatted = formatted
+    .replace(
+      /\*\*(.*?)\*\*/g,
+      "<strong>$1</strong>"
+    )
+    .replace(
+      /^### (.*)$/gm,
+      "<h3>$1</h3>"
+    )
+    .replace(
+      /^## (.*)$/gm,
+      "<h2>$1</h2>"
+    )
+    .replace(
+      /^# (.*)$/gm,
+      "<h1>$1</h1>"
+    )
+    .replace(
+      /\n/g,
+      "<br>"
+    );
+
+  message.innerHTML = formatted;
 
   chat.appendChild(message);
 
@@ -919,120 +461,118 @@ function addMessage(text, type) {
 }
 
 
-/* ---------------------------
-   SPEECH RECOGNITION
---------------------------- */
+/* =========================================================
+   COMPOSER BUTTON
+   ========================================================= */
 
-function listen() {
+function updateComposerButton() {
 
-  const SpeechRecognition =
-    window.SpeechRecognition ||
-    window.webkitSpeechRecognition;
+  if (!button) return;
 
-  if (!SpeechRecognition) {
 
-    statusText.textContent =
-      "Speech recognition isn't supported here.";
+  /*
+    If microphone or audio is active,
+    don't switch the button to Send.
+  */
+
+  if (recognition || currentAudio) {
 
     return;
+
   }
 
-  recognition =
-    new SpeechRecognition();
 
-  recognition.lang = "en-IN";
-  recognition.continuous = false;
-  recognition.interimResults = false;
+  if (input.value.trim()) {
 
-  recognition.onstart = function() {
+    button.textContent = "➤";
 
-    statusText.textContent =
-      "🎙️ Listening...";
+    button.classList.remove("stop-mode");
 
-    character.classList.add("listening");
-
-    button.textContent = "⏹";
-    button.classList.add("stop-mode");
-    button.setAttribute("aria-label", "Stop");
-  };
-
-
-  recognition.onresult = function(event) {
-
-    const text =
-      event.results[0][0].transcript;
-
-    input.value = "";
-
-    updateComposerButton();
-
-    addMessage(text, "user");
-
-    processMessage(text);
-  };
-
-
-  recognition.onerror = function(event) {
-
-    console.error(
-      "Speech recognition error:",
-      event
+    button.setAttribute(
+      "aria-label",
+      "Send"
     );
 
-    character.classList.remove("listening");
+  } else {
 
-    recognition = null;
+    button.textContent = "🎙️";
 
-    statusText.textContent =
-      "I couldn't hear that. Try again.";
+    button.classList.remove("stop-mode");
 
-    updateComposerButton();
-  };
-
-
-  recognition.onend = function() {
-
-    character.classList.remove("listening");
-
-    recognition = null;
-
-    updateComposerButton();
-
-    if (!currentAudio) {
-      statusText.textContent =
-        "Ready to listen";
-    }
-  };
-
-
-  try {
-
-    recognition.start();
-
-  } catch (error) {
-
-    console.error(
-      "Recognition start error:",
-      error
+    button.setAttribute(
+      "aria-label",
+      "Speak"
     );
 
-    recognition = null;
-
-    updateComposerButton();
   }
+
 }
 
 
-/* ---------------------------
-   SEND TEXT
---------------------------- */
+input.addEventListener(
+  "input",
+  updateComposerButton
+);
+
+
+/* =========================================================
+   MAIN COMPOSER ACTION
+   ========================================================= */
+
+function composerAction() {
+
+  /*
+    If currently listening or speaking,
+    button becomes STOP.
+  */
+
+  if (recognition || currentAudio) {
+
+    stopEverything();
+
+    return;
+
+  }
+
+
+  /*
+    If user typed something,
+    send it.
+  */
+
+  if (input.value.trim()) {
+
+    sendText();
+
+    return;
+
+  }
+
+
+  /*
+    Otherwise start microphone.
+  */
+
+  listen();
+
+}
+
+
+/* =========================================================
+   TEXT MESSAGE
+   ========================================================= */
 
 function sendText() {
 
-  const text =
-    input.value.trim();
+  const text = input.value.trim();
 
-  if (!text) return;
+  if (!text) {
+
+    updateComposerButton();
+
+    return;
+
+  }
 
   input.value = "";
 
@@ -1044,27 +584,297 @@ function sendText() {
   );
 
   processMessage(text);
+
 }
 
 
-/* ---------------------------
-   AI PROCESSING
---------------------------- */
+/* =========================================================
+   ENTER KEY
+   ========================================================= */
+
+input.addEventListener(
+  "keydown",
+  function(event) {
+
+    if (event.key === "Enter") {
+
+      event.preventDefault();
+
+      sendText();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   SPEECH RECOGNITION
+   ========================================================= */
+
+function listen() {
+
+  const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+
+  if (!SpeechRecognition) {
+
+    statusText.textContent =
+      "⚠️ Speech recognition isn't supported.";
+
+    return;
+
+  }
+
+
+  /*
+    Make sure old recognition is gone.
+  */
+
+  if (recognition) {
+
+    try {
+
+      recognition.stop();
+
+    } catch (error) {}
+
+    recognition = null;
+
+  }
+
+
+  recognition =
+    new SpeechRecognition();
+
+
+  /*
+    English India.
+
+    We can later improve this for
+    automatic multilingual recognition.
+  */
+
+  recognition.lang = "en-IN";
+
+  recognition.continuous = false;
+
+  recognition.interimResults = false;
+
+  recognition.maxAlternatives = 1;
+
+
+  /* ---------------------------
+     START
+  --------------------------- */
+
+  recognition.onstart = function() {
+
+    statusText.textContent =
+      "🎙️ Listening...";
+
+    character.classList.add(
+      "listening"
+    );
+
+    button.textContent = "⏹";
+
+    button.classList.add(
+      "stop-mode"
+    );
+
+    button.setAttribute(
+      "aria-label",
+      "Stop"
+    );
+
+  };
+
+
+  /* ---------------------------
+     RESULT
+  --------------------------- */
+
+  recognition.onresult = function(event) {
+
+    const result =
+      event.results[0][0];
+
+    const text =
+      result.transcript.trim();
+
+
+    character.classList.remove(
+      "listening"
+    );
+
+
+    if (!text) {
+
+      return;
+
+    }
+
+
+    input.value = "";
+
+    addMessage(
+      text,
+      "user"
+    );
+
+
+    processMessage(text);
+
+  };
+
+
+  /* ---------------------------
+     ERROR
+  --------------------------- */
+
+  recognition.onerror = function(event) {
+
+    console.error(
+      "Speech recognition error:",
+      event.error
+    );
+
+
+    character.classList.remove(
+      "listening"
+    );
+
+
+    recognition = null;
+
+
+    /*
+      Don't show an annoying error
+      for normal microphone cancellation.
+    */
+
+    if (
+      event.error === "aborted"
+    ) {
+
+      statusText.textContent =
+        "Ready to listen";
+
+    } else if (
+      event.error === "not-allowed" ||
+      event.error === "service-not-allowed"
+    ) {
+
+      statusText.textContent =
+        "⚠️ Microphone permission denied.";
+
+    } else if (
+      event.error === "no-speech"
+    ) {
+
+      statusText.textContent =
+        "I couldn't hear that. Try again.";
+
+    } else {
+
+      statusText.textContent =
+        "⚠️ Voice input error.";
+
+    }
+
+
+    updateComposerButton();
+
+  };
+
+
+  /* ---------------------------
+     END
+  --------------------------- */
+
+  recognition.onend = function() {
+
+    character.classList.remove(
+      "listening"
+    );
+
+
+    recognition = null;
+
+
+    /*
+      If Sushree isn't speaking,
+      return button to normal.
+    */
+
+    if (!currentAudio) {
+
+      statusText.textContent =
+        "Ready to listen";
+
+      updateComposerButton();
+
+    }
+
+  };
+
+
+  /* ---------------------------
+     START MICROPHONE
+  --------------------------- */
+
+  try {
+
+    recognition.start();
+
+  } catch (error) {
+
+    console.error(
+      "Could not start recognition:",
+      error
+    );
+
+    recognition = null;
+
+    character.classList.remove(
+      "listening"
+    );
+
+    statusText.textContent =
+      "⚠️ Couldn't start microphone.";
+
+    updateComposerButton();
+
+  }
+
+}
+
+
+/* =========================================================
+   PROCESS MESSAGE
+   ========================================================= */
 
 async function processMessage(text) {
 
   statusText.textContent =
     "🧠 Thinking...";
 
-  character.classList.add("thinking");
+  character.classList.add(
+    "thinking"
+  );
 
 
-  /* Remember name */
+  /* ---------------------------
+     REMEMBER USER'S NAME
+  --------------------------- */
 
-  const nameMatch =
-    text.match(
-      /\b(?:my name is|i am|i'm|call me)\s+([A-Za-z][A-Za-z\s'-]{0,30})/i
-    );
+  const nameMatch = text.match(
+    /\b(?:my name is|i am|i'm|call me)\s+([A-Za-z][A-Za-z\s'-]{0,30})/i
+  );
+
 
   if (nameMatch) {
 
@@ -1075,18 +885,27 @@ async function processMessage(text) {
       "name",
       name
     );
+
   }
 
 
-  /* Memory context */
+  /* ---------------------------
+     MEMORY CONTEXT
+  --------------------------- */
 
   const memoryContext =
     Object.keys(memory).length
+
       ? `Known information about the user: ${JSON.stringify(memory)}`
+
       : "No saved information about the user yet.";
 
 
   try {
+
+    /* ---------------------------
+       CALL WORKER
+    --------------------------- */
 
     const response =
       await fetch(
@@ -1108,12 +927,18 @@ async function processMessage(text) {
               history
 
           })
+
         }
       );
 
 
+    /* ---------------------------
+       READ RESPONSE
+    --------------------------- */
+
     const raw =
       await response.text();
+
 
     let data;
 
@@ -1133,6 +958,7 @@ async function processMessage(text) {
       throw new Error(
         "Worker returned an invalid response."
       );
+
     }
 
 
@@ -1142,67 +968,122 @@ async function processMessage(text) {
     );
 
 
+    /* ---------------------------
+       HTTP ERROR
+    --------------------------- */
+
     if (!response.ok) {
 
       throw new Error(
-        data.error ||
-        `Worker returned HTTP ${response.status}`
+
+        data.details
+
+          ? JSON.stringify(
+              data.details
+            )
+
+          : (
+              data.error ||
+              `Worker returned HTTP ${response.status}`
+            )
+
       );
+
     }
 
+
+    /* ---------------------------
+       SUCCESS
+    --------------------------- */
 
     if (
       data.success &&
       data.reply
     ) {
 
+      /*
+        Save conversation history.
+      */
+
       history.push({
+
         role: "user",
+
         parts: [
           {
             text: text
           }
         ]
+
       });
 
 
       history.push({
+
         role: "model",
+
         parts: [
           {
             text: data.reply
           }
         ]
+
       });
+
+
+      /*
+        Prevent unlimited history growth.
+      */
+
+      if (history.length > 30) {
+
+        history =
+          history.slice(-30);
+
+      }
+
+
+      character.classList.remove(
+        "thinking"
+      );
 
 
       addMessage(
         data.reply,
-        "assistant"
+        "sushree"
       );
 
 
-      character.classList.remove(
-        "thinking"
-      );
+      /*
+        Speak the AI response.
+      */
 
-      await speak(
+      speak(
         data.reply
       );
 
-    } else {
 
-      addMessage(
-        data.error ||
-        "Sorry, I couldn't get a response right now.",
-        "assistant"
-      );
+    } else {
 
       character.classList.remove(
         "thinking"
       );
-    }
 
+
+      addMessage(
+
+        data.error ||
+        "Sorry, I couldn't get a response right now.",
+
+        "sushree"
+
+      );
+
+
+      statusText.textContent =
+        "Ready to listen";
+
+    }
 
   } catch (error) {
 
@@ -1218,24 +1099,33 @@ async function processMessage(text) {
 
 
     addMessage(
+
       `Sorry, something went wrong: ${error.message}`,
-      "assistant"
+
+      "sushree"
+
     );
-  }
 
-
-  if (!currentAudio) {
 
     statusText.textContent =
-      "🟢 Online";
+      "⚠️ Connection error";
 
   }
+
 }
 
 
-/* ---------------------------
-   PCM BASE64 → WAV
---------------------------- */
+/* =========================================================
+   GEMINI TTS — ZEPHYR
+   ========================================================= */
+
+/*
+  Gemini returns raw PCM audio.
+
+  We convert the PCM bytes into a WAV file
+  so the browser can play it.
+*/
+
 
 function base64ToWav(
   base64,
@@ -1244,6 +1134,7 @@ function base64ToWav(
 
   const binary =
     atob(base64);
+
 
   const pcm =
     new Uint8Array(
@@ -1259,16 +1150,19 @@ function base64ToWav(
 
     pcm[i] =
       binary.charCodeAt(i);
+
   }
 
 
   const dataLength =
     pcm.length;
 
+
   const buffer =
     new ArrayBuffer(
       44 + dataLength
     );
+
 
   const view =
     new DataView(buffer);
@@ -1289,16 +1183,19 @@ function base64ToWav(
         offset + i,
         string.charCodeAt(i)
       );
+
     }
+
   }
 
 
-  /* WAV header */
+  /* RIFF */
 
   writeString(
     0,
     "RIFF"
   );
+
 
   view.setUint32(
     4,
@@ -1306,22 +1203,31 @@ function base64ToWav(
     true
   );
 
+
   writeString(
     8,
     "WAVE"
   );
 
 
+  /* fmt */
+
   writeString(
     12,
     "fmt "
   );
+
 
   view.setUint32(
     16,
     16,
     true
   );
+
+
+  /*
+    PCM format
+  */
 
   view.setUint16(
     20,
@@ -1329,11 +1235,21 @@ function base64ToWav(
     true
   );
 
+
+  /*
+    Mono
+  */
+
   view.setUint16(
     22,
     1,
     true
   );
+
+
+  /*
+    Sample rate
+  */
 
   view.setUint32(
     24,
@@ -1341,17 +1257,33 @@ function base64ToWav(
     true
   );
 
+
+  /*
+    Byte rate
+    24000 × 1 × 16/8
+  */
+
   view.setUint32(
     28,
     sampleRate * 2,
     true
   );
 
+
+  /*
+    Block align
+  */
+
   view.setUint16(
     32,
     2,
     true
   );
+
+
+  /*
+    16-bit audio
+  */
 
   view.setUint16(
     34,
@@ -1360,10 +1292,13 @@ function base64ToWav(
   );
 
 
+  /* data */
+
   writeString(
     36,
     "data"
   );
+
 
   view.setUint32(
     40,
@@ -1371,6 +1306,10 @@ function base64ToWav(
     true
   );
 
+
+  /*
+    Copy PCM data.
+  */
 
   new Uint8Array(
     buffer,
@@ -1384,12 +1323,13 @@ function base64ToWav(
       type: "audio/wav"
     }
   );
+
 }
 
 
-/* ---------------------------
-   TEXT TO SPEECH
---------------------------- */
+/* =========================================================
+   SPEAK
+   ========================================================= */
 
 async function speak(text) {
 
@@ -1397,27 +1337,97 @@ async function speak(text) {
     !text ||
     !text.trim()
   ) {
+
     return;
+
+  }
+
+
+  /*
+    Stop old audio.
+  */
+
+  if (currentAudio) {
+
+    try {
+
+      currentAudio.pause();
+
+      currentAudio.currentTime = 0;
+
+    } catch (error) {}
+
+    currentAudio = null;
+
+  }
+
+
+  /*
+    Clean text for TTS.
+  */
+
+  let cleanText =
+    String(text);
+
+
+  try {
+
+    cleanText =
+      cleanText.replace(
+        /\p{Emoji_Presentation}|\p{Extended_Pictographic}/gu,
+        ""
+      );
+
+  } catch (error) {
+
+    /*
+      Older browsers may not support
+      Unicode property escapes.
+    */
+
+    cleanText =
+      cleanText.replace(
+        /[\u{1F300}-\u{1FAFF}]/gu,
+        ""
+      );
+
+  }
+
+
+  cleanText =
+    cleanText
+      .replace(
+        /\s+/g,
+        " "
+      )
+      .trim();
+
+
+  if (!cleanText) {
+
+    statusText.textContent =
+      "Ready to listen";
+
+    character.classList.remove(
+      "speaking"
+    );
+
+    updateComposerButton();
+
+    return;
+
   }
 
 
   try {
 
-    /* Stop previous audio */
-
-    if (currentAudio) {
-
-      currentAudio.pause();
-
-      currentAudio.currentTime =
-        0;
-
-      currentAudio = null;
-    }
-
-
     statusText.textContent =
       "🔊 Sushree is preparing to speak...";
+
+
+    character.classList.remove(
+      "thinking"
+    );
 
 
     character.classList.add(
@@ -1428,15 +1438,21 @@ async function speak(text) {
     button.textContent =
       "⏹️";
 
+
     button.classList.add(
       "stop-mode"
     );
+
 
     button.setAttribute(
       "aria-label",
       "Stop"
     );
 
+
+    /* ---------------------------
+       REQUEST TTS
+    --------------------------- */
 
     const response =
       await fetch(
@@ -1453,38 +1469,77 @@ async function speak(text) {
 
             action: "tts",
 
-            message: text,
+            message: cleanText,
 
             voice: "Zephyr"
 
           })
+
         }
       );
 
 
-    const data =
-      await response.json();
+    /* ---------------------------
+       RESPONSE
+    --------------------------- */
+
+    const raw =
+      await response.text();
+
+
+    let data;
+
+
+    try {
+
+      data =
+        JSON.parse(raw);
+
+    } catch (error) {
+
+      console.error(
+        "Invalid TTS JSON:",
+        raw
+      );
+
+      throw new Error(
+        "TTS returned an invalid response."
+      );
+
+    }
+
+
+    console.log(
+      "TTS response:",
+      data
+    );
 
 
     if (
       !response.ok ||
-      !data.success ||
-      !data.audio
+      !data.success
     ) {
-
-      console.error(
-        "TTS error:",
-        data
-      );
 
       throw new Error(
         data.error ||
-        "TTS audio was not returned."
+        `TTS failed with HTTP ${response.status}`
       );
+
     }
 
 
-    /* Gemini returns raw PCM */
+    if (!data.audio) {
+
+      throw new Error(
+        "No audio was returned by the Worker."
+      );
+
+    }
+
+
+    /* ---------------------------
+       PCM → WAV
+    --------------------------- */
 
     const wavBlob =
       base64ToWav(
@@ -1499,40 +1554,69 @@ async function speak(text) {
       );
 
 
+    const audio =
+      new Audio(
+        audioURL
+      );
+
+
     currentAudio =
-      new Audio(audioURL);
+      audio;
 
 
-    currentAudio.onplay =
+    /* ---------------------------
+       PLAY
+    --------------------------- */
+
+    audio.onplay =
       function() {
 
         statusText.textContent =
           "🔊 Sushree is speaking...";
+
       };
 
 
-    currentAudio.onended =
+    /* ---------------------------
+       FINISHED
+    --------------------------- */
+
+    audio.onended =
       function() {
-
-        statusText.textContent =
-          "Ready to listen";
-
-        character.classList.remove(
-          "speaking"
-        );
 
         URL.revokeObjectURL(
           audioURL
         );
 
-        currentAudio =
-          null;
+
+        if (
+          currentAudio === audio
+        ) {
+
+          currentAudio = null;
+
+        }
+
+
+        character.classList.remove(
+          "speaking"
+        );
+
+
+        statusText.textContent =
+          "Ready to listen";
+
 
         updateComposerButton();
+
       };
 
 
-    currentAudio.onerror =
+    /* ---------------------------
+       AUDIO ERROR
+    --------------------------- */
+
+    audio.onerror =
       function(error) {
 
         console.error(
@@ -1540,97 +1624,132 @@ async function speak(text) {
           error
         );
 
-        statusText.textContent =
-          "⚠️ Audio playback error";
-
-        character.classList.remove(
-          "speaking"
-        );
 
         URL.revokeObjectURL(
           audioURL
         );
 
-        currentAudio =
-          null;
+
+        if (
+          currentAudio === audio
+        ) {
+
+          currentAudio = null;
+
+        }
+
+
+        character.classList.remove(
+          "speaking"
+        );
+
+
+        statusText.textContent =
+          "⚠️ Audio playback error";
+
 
         updateComposerButton();
+
       };
 
 
-    await currentAudio.play();
+    /*
+      Start playback.
+    */
+
+    await audio.play();
 
 
   } catch (error) {
 
     console.error(
-      "Sushree TTS error:",
+      "Sushree TTS Error:",
       error
     );
 
-
-    statusText.textContent =
-      "⚠️ Voice unavailable";
 
     character.classList.remove(
       "speaking"
     );
 
 
-    currentAudio =
-      null;
+    currentAudio = null;
+
+
+    statusText.textContent =
+      "⚠️ Voice unavailable";
+
 
     updateComposerButton();
+
   }
+
 }
 
 
-/* ---------------------------
+/* =========================================================
    STOP EVERYTHING
---------------------------- */
+   ========================================================= */
 
 function stopEverything() {
 
-  /* Stop microphone */
+  /* ---------------------------
+     STOP MICROPHONE
+  --------------------------- */
 
   if (recognition) {
 
     try {
 
-      recognition.stop();
+      recognition.abort();
 
     } catch (error) {}
 
+    recognition = null;
+
   }
 
-  recognition =
-    null;
 
-
-  /* Stop TTS */
+  /* ---------------------------
+     STOP AUDIO
+  --------------------------- */
 
   if (currentAudio) {
 
-    currentAudio.pause();
+    try {
 
-    currentAudio.currentTime =
-      0;
+      currentAudio.pause();
 
-    currentAudio =
-      null;
+      currentAudio.currentTime = 0;
+
+    } catch (error) {}
+
+    currentAudio = null;
+
   }
 
 
-  /* Stop browser speech synthesis
-     just in case */
+  /*
+    Also stop browser speech
+    synthesis if anything is active.
+  */
 
   if (
     "speechSynthesis" in window
   ) {
 
-    speechSynthesis.cancel();
+    try {
+
+      speechSynthesis.cancel();
+
+    } catch (error) {}
+
   }
 
+
+  /* ---------------------------
+     RESET CHARACTER
+  --------------------------- */
 
   character.classList.remove(
     "listening"
@@ -1645,39 +1764,45 @@ function stopEverything() {
   );
 
 
+  /* ---------------------------
+     RESET STATUS
+  --------------------------- */
+
   statusText.textContent =
     "Ready to listen";
 
 
+  /* ---------------------------
+     RESET BUTTON
+  --------------------------- */
+
   updateComposerButton();
+
 }
 
 
-/* ---------------------------
-   ENTER KEY
---------------------------- */
-
-input.addEventListener(
-  "keydown",
-  function(event) {
-
-    if (
-      event.key === "Enter"
-    ) {
-
-      event.preventDefault();
-
-      sendText();
-    }
-  }
-);
-
-
-/* ---------------------------
+/* =========================================================
    INITIAL STATE
---------------------------- */
+   ========================================================= */
 
 updateComposerButton();
+
+statusText.textContent =
+  "Ready to listen";
+
+
+/* =========================================================
+   DEBUG INFORMATION
+   ========================================================= */
+
+console.log(
+  "Sushree AI initialized successfully."
+);
+
+console.log(
+  "Worker:",
+  WORKER_URL
+);
 
 </script>
 
