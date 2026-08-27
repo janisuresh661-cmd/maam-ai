@@ -2,10 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-<title>Sushree</title>
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+               viewport-fit=cover">
+
+<title>Sushree AI</title>
 
 <style>
 * {
@@ -19,10 +21,15 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont,
-                 "Segoe UI", sans-serif;
-    background: #0b0d10;
-    color: #f4f4f5;
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    background: #08060d;
+    color: #fff;
 }
 
 body {
@@ -32,218 +39,580 @@ body {
 
 .app {
     width: 100%;
-    max-width: 700px;
+    max-width: 520px;
     height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    background: #101318;
+    position: relative;
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% -10%,
+            rgba(174, 83, 255, .22),
+            transparent 38%
+        ),
+        linear-gradient(
+            160deg,
+            #120b1c,
+            #08060d 55%,
+            #0c0713
+        );
 }
 
-/* =========================
+/* --------------------------------
    HEADER
-========================= */
+-------------------------------- */
 
 .header {
-    padding: 18px 20px 12px;
-    text-align: center;
-    border-bottom: 1px solid #242830;
+    height: 72px;
+    padding:
+        env(safe-area-inset-top)
+        18px 0 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    position: relative;
+    z-index: 5;
+
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(10, 7, 15, .95),
+            rgba(10, 7, 15, .55),
+            transparent
+        );
 }
 
-.header h1 {
-    margin: 0;
-    font-size: 22px;
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.lotus {
+    width: 40px;
+    height: 40px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(221, 143, 255, .28),
+            rgba(120, 40, 180, .10)
+        );
+
+    border: 1px solid rgba(220, 150, 255, .25);
+
+    box-shadow:
+        0 0 22px rgba(190, 80, 255, .18);
+
+    font-size: 21px;
+}
+
+.brand-name {
+    font-size: 18px;
     font-weight: 700;
+    letter-spacing: .3px;
 }
 
-.header p {
-    margin: 5px 0 0;
-    font-size: 13px;
-    color: #8d949f;
+.brand-status {
+    font-size: 11px;
+    color: #bbaec7;
+    margin-top: 2px;
 }
 
-/* =========================
+.online-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #69e6a7;
+    margin-right: 5px;
+    box-shadow: 0 0 8px #69e6a7;
+}
+
+.header-button {
+    width: 38px;
+    height: 38px;
+
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 12px;
+
+    background: rgba(255,255,255,.05);
+    color: #ddd;
+
+    font-size: 17px;
+}
+
+/* --------------------------------
    CHARACTER
-========================= */
+-------------------------------- */
 
 .character-area {
+    position: absolute;
+    top: 74px;
+    left: 0;
+    right: 0;
+
+    height: 210px;
+
     display: flex;
-    justify-content: center;
     align-items: center;
-    padding: 28px 20px 15px;
+    justify-content: center;
+
+    pointer-events: none;
+}
+
+.character-glow {
+    position: absolute;
+
+    width: 180px;
+    height: 180px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(203, 105, 255, .25),
+            rgba(140, 50, 210, .08) 45%,
+            transparent 70%
+        );
+
+    filter: blur(8px);
 }
 
 .character {
-    width: 125px;
-    height: 125px;
+    position: relative;
+
+    width: 150px;
+    height: 150px;
+
     border-radius: 50%;
+
     display: flex;
-    justify-content: center;
     align-items: center;
-    background: #181c23;
-    border: 2px solid #303641;
-    font-size: 48px;
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.08),
+            rgba(255,255,255,.015)
+        );
+
+    border: 1px solid rgba(221, 155, 255, .22);
+
+    box-shadow:
+        0 0 35px rgba(176, 72, 255, .18),
+        inset 0 0 30px rgba(255,255,255,.025);
+
+    overflow: hidden;
+
     transition:
-        transform .25s ease,
-        box-shadow .25s ease,
-        border-color .25s ease;
+        transform .3s ease,
+        box-shadow .3s ease;
 }
 
-.character.thinking {
-    animation: thinking 1.3s infinite ease-in-out;
+.character-face {
+    font-size: 78px;
+    filter:
+        drop-shadow(0 8px 16px rgba(0,0,0,.45));
 }
 
 .character.listening {
-    border-color: #5e9cff;
-    box-shadow: 0 0 25px rgba(94,156,255,.25);
-    animation: listening 1.2s infinite ease-in-out;
+    transform: scale(1.05);
+
+    box-shadow:
+        0 0 50px rgba(213, 104, 255, .38),
+        0 0 100px rgba(146, 60, 255, .16);
 }
 
-.character.speaking {
-    border-color: #72d6a0;
-    box-shadow: 0 0 30px rgba(114,214,160,.25);
-    animation: speaking .8s infinite alternate;
+.character.listening::after {
+    content: "";
+
+    position: absolute;
+    inset: 8px;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(224, 139, 255, .5);
+
+    animation: pulse 1.4s infinite;
 }
 
-@keyframes thinking {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.04); }
+@keyframes pulse {
+    0%,100% {
+        transform: scale(.94);
+        opacity: .2;
+    }
+
+    50% {
+        transform: scale(1.08);
+        opacity: .9;
+    }
 }
 
-@keyframes listening {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.06); }
+.character-name {
+    position: absolute;
+
+    bottom: 3px;
+
+    font-size: 11px;
+    letter-spacing: 1.4px;
+
+    color: #cdbbd8;
 }
 
-@keyframes speaking {
-    from { transform: scale(1); }
-    to   { transform: scale(1.07); }
-}
-
-/* =========================
+/* --------------------------------
    STATUS
-========================= */
+-------------------------------- */
 
 .status {
-    min-height: 42px;
-    padding: 8px 20px;
+    position: absolute;
+
+    top: 270px;
+    left: 0;
+    right: 0;
+
     text-align: center;
-    color: #aab0ba;
-    font-size: 14px;
+
+    font-size: 12px;
+    color: #9e91aa;
+
+    z-index: 3;
+
+    transition: .25s;
 }
 
-/* =========================
+/* --------------------------------
    CHAT
-========================= */
+-------------------------------- */
 
 .chat {
-    flex: 1;
+    position: absolute;
+
+    top: 300px;
+    bottom: 94px;
+
+    left: 0;
+    right: 0;
+
+    padding:
+        12px 15px 30px;
+
     overflow-y: auto;
-    padding: 10px 16px 20px;
-    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+
+    scrollbar-width: none;
+}
+
+.chat::-webkit-scrollbar {
+    display: none;
+}
+
+.message-row {
+    display: flex;
+    margin: 9px 0;
+
+    animation:
+        messageIn .25s ease;
+}
+
+.message-row.user {
+    justify-content: flex-end;
+}
+
+.message-row.sushree {
+    justify-content: flex-start;
+}
+
+@keyframes messageIn {
+    from {
+        opacity: 0;
+        transform: translateY(7px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .message {
-    max-width: 85%;
-    margin: 8px 0;
-    padding: 11px 14px;
-    border-radius: 16px;
-    line-height: 1.45;
-    font-size: 15px;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
+    max-width: 82%;
+
+    padding:
+        11px 14px;
+
+    border-radius: 17px;
+
+    font-size: 14px;
+    line-height: 1.48;
+
+    word-wrap: break-word;
 }
 
-.message.user {
-    margin-left: auto;
-    background: #29313d;
-    border-bottom-right-radius: 5px;
-}
+.message-row.sushree .message {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(152, 77, 204, .18),
+            rgba(255,255,255,.045)
+        );
 
-.message.assistant {
-    margin-right: auto;
-    background: #181c23;
-    border: 1px solid #282e38;
+    border:
+        1px solid rgba(212, 132, 255, .13);
+
     border-bottom-left-radius: 5px;
+
+    color: #eee7f2;
 }
 
-/* =========================
+.message-row.user .message {
+    background:
+        linear-gradient(
+            145deg,
+            #8b42ba,
+            #6e2f9d
+        );
+
+    border-bottom-right-radius: 5px;
+
+    color: white;
+
+    box-shadow:
+        0 5px 18px rgba(120, 40, 170, .18);
+}
+
+.time {
+    display: block;
+
+    margin-top: 5px;
+
+    font-size: 9px;
+    opacity: .45;
+
+    text-align: right;
+}
+
+/* --------------------------------
+   TYPING
+-------------------------------- */
+
+.typing {
+    display: none;
+
+    width: fit-content;
+
+    padding: 10px 13px;
+
+    border-radius: 16px;
+    border-bottom-left-radius: 5px;
+
+    background: rgba(255,255,255,.045);
+    border: 1px solid rgba(255,255,255,.07);
+}
+
+.typing.show {
+    display: flex;
+    gap: 4px;
+}
+
+.typing span {
+    width: 5px;
+    height: 5px;
+
+    border-radius: 50%;
+
+    background: #c39ad5;
+
+    animation: typing 1s infinite;
+}
+
+.typing span:nth-child(2) {
+    animation-delay: .15s;
+}
+
+.typing span:nth-child(3) {
+    animation-delay: .3s;
+}
+
+@keyframes typing {
+    0%,60%,100% {
+        transform: translateY(0);
+        opacity: .35;
+    }
+
+    30% {
+        transform: translateY(-4px);
+        opacity: 1;
+    }
+}
+
+/* --------------------------------
    COMPOSER
-========================= */
+-------------------------------- */
+
+.composer-wrap {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    padding:
+        8px 13px
+        calc(10px + env(safe-area-inset-bottom));
+
+    background:
+        linear-gradient(
+            to top,
+            #09070d 65%,
+            rgba(9,7,13,.88),
+            transparent
+        );
+
+    z-index: 10;
+}
 
 .composer {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     gap: 8px;
-    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
-    border-top: 1px solid #242830;
-    background: #101318;
+
+    padding: 6px;
+
+    border-radius: 19px;
+
+    background:
+        rgba(255,255,255,.055);
+
+    border:
+        1px solid rgba(255,255,255,.10);
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.28);
 }
 
-.input {
+#input {
     flex: 1;
-    min-height: 48px;
-    max-height: 130px;
-    resize: none;
-    border: 1px solid #303641;
+
+    min-width: 0;
+
+    border: 0;
     outline: none;
-    border-radius: 16px;
-    background: #181c23;
-    color: #fff;
-    padding: 13px 14px;
-    font: inherit;
+
+    background: transparent;
+
+    color: white;
+
+    font-size: 14px;
+
+    padding:
+        9px 8px;
 }
 
-.input:focus {
-    border-color: #505967;
-}
-
-.input::placeholder {
-    color: #747c87;
+#input::placeholder {
+    color: #7f7487;
 }
 
 .composer-button {
-    width: 48px;
-    height: 48px;
-    flex: 0 0 48px;
+    flex: 0 0 auto;
+
+    width: 42px;
+    height: 42px;
+
     border: 0;
-    border-radius: 50%;
-    background: #e9edf2;
-    color: #101318;
-    font-size: 21px;
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #a84bd3,
+            #71349b
+        );
+
+    color: white;
+
+    font-size: 18px;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    touch-action: manipulation;
-    transition:
-        transform .15s ease,
-        background .15s ease;
+
+    transition: .2s;
+
+    box-shadow:
+        0 5px 18px rgba(146, 55, 190, .25);
 }
 
 .composer-button:active {
-    transform: scale(.92);
-}
-
-.composer-button:disabled {
-    opacity: .55;
+    transform: scale(.91);
 }
 
 .composer-button.stop-mode {
-    background: #e45c5c;
-    color: white;
+    background:
+        linear-gradient(
+            145deg,
+            #d25372,
+            #963d59
+        );
 }
 
-/* =========================
-   SCROLLBAR
-========================= */
+/* --------------------------------
+   FOOTER
+-------------------------------- */
 
-.chat::-webkit-scrollbar {
-    width: 5px;
+.footer {
+    position: absolute;
+
+    bottom: 1px;
+
+    left: 0;
+    right: 0;
+
+    text-align: center;
+
+    font-size: 8px;
+
+    color: rgba(255,255,255,.22);
+
+    pointer-events: none;
 }
 
-.chat::-webkit-scrollbar-thumb {
-    background: #343a44;
-    border-radius: 10px;
+/* --------------------------------
+   SMALL SCREENS
+-------------------------------- */
+
+@media (max-height: 650px) {
+
+    .character-area {
+        height: 150px;
+    }
+
+    .character {
+        width: 105px;
+        height: 105px;
+    }
+
+    .character-face {
+        font-size: 55px;
+    }
+
+    .status {
+        top: 225px;
+    }
+
+    .chat {
+        top: 250px;
+    }
 }
 </style>
 </head>
@@ -252,316 +621,203 @@ body {
 
 <div class="app">
 
+    <!-- HEADER -->
+
     <header class="header">
-        <h1>Sushree</h1>
-        <p>Your personal AI assistant</p>
-    </header>
 
-    <section class="character-area">
-        <div id="character" class="character">
-            🌸
+        <div class="brand">
+
+            <div class="lotus">
+                🪷
+            </div>
+
+            <div>
+                <div class="brand-name">
+                    Sushree AI
+                </div>
+
+                <div class="brand-status">
+                    <span class="online-dot"></span>
+                    Always here
+                </div>
+            </div>
+
         </div>
-    </section>
-
-    <div id="statusText" class="status">
-        Ready to listen
-    </div>
-
-    <main id="chat" class="chat"></main>
-
-    <div class="composer">
-
-        <textarea
-            id="input"
-            class="input"
-            rows="1"
-            placeholder="Message Sushree..."
-            autocomplete="off"
-            spellcheck="true"></textarea>
 
         <button
-            id="composerButton"
-            class="composer-button"
-            type="button"
-            aria-label="Speak">
-            🎙️
+            class="header-button"
+            onclick="clearChat()"
+            aria-label="Clear chat">
+            ⋮
         </button>
 
+    </header>
+
+
+    <!-- CHARACTER -->
+
+    <div class="character-area">
+
+        <div class="character-glow"></div>
+
+        <div
+            id="character"
+            class="character">
+
+            <div class="character-face">
+                👩🏻‍💼
+            </div>
+
+            <div class="character-name">
+                SUSHREE
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- STATUS -->
+
+    <div
+        id="status"
+        class="status">
+        Your companion is ready ✨
+    </div>
+
+
+    <!-- CHAT -->
+
+    <main
+        id="chat"
+        class="chat">
+
+        <div class="message-row sushree">
+
+            <div class="message">
+
+                Hi! I'm Sushree. 🪷
+
+                <br><br>
+
+                I'm here to talk, explain,
+                help you learn, or simply
+                keep you company.
+
+                <br><br>
+
+                So... what are we thinking
+                about today? 😊
+
+                <span class="time">
+                    now
+                </span>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- COMPOSER -->
+
+    <div class="composer-wrap">
+
+        <div class="composer">
+
+            <input
+                id="input"
+                type="text"
+                autocomplete="off"
+                placeholder="Talk to Sushree..."
+                onkeydown="handleKey(event)"
+            >
+
+            <button
+                id="composerButton"
+                class="composer-button"
+                onclick="composerAction()"
+                aria-label="Speak">
+
+                🎙️
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <div class="footer">
+        Sushree AI • Designed &amp; Evolved by Sukesh ✨
     </div>
 
 </div>
 
+
 <script>
 
-/* =========================================================
-   CONFIGURATION
-========================================================= */
-
-const WORKER_URL =
-    "https://spring-cake-3e86.janisuresh661.workers.dev/";
-
-
-/* =========================================================
-   DOM
-========================================================= */
+/* --------------------------------
+   ELEMENTS
+-------------------------------- */
 
 const input =
     document.getElementById("input");
 
-const button =
-    document.getElementById("composerButton");
+const chat =
+    document.getElementById("chat");
 
 const statusText =
-    document.getElementById("statusText");
+    document.getElementById("status");
 
 const character =
     document.getElementById("character");
 
-const chat =
-    document.getElementById("chat");
-
-
-/* =========================================================
-   STATE
-========================================================= */
 
 let recognition = null;
-let currentAudio = null;
-let currentAudioURL = null;
 
-let isListening = false;
-let isSpeaking = false;
-let isProcessing = false;
-
-let requestController = null;
+let history = [];
 
 
-/* =========================================================
-   UTILITY
-========================================================= */
+/* --------------------------------
+   COMPOSER ACTION
 
-function setStatus(text) {
-    statusText.textContent = text;
-}
+   This follows the earlier
+   Sushree structure.
+-------------------------------- */
 
+function composerAction() {
 
-function setCharacter(mode) {
-
-    character.classList.remove(
-        "thinking",
-        "listening",
-        "speaking"
-    );
-
-    if (mode) {
-        character.classList.add(mode);
-    }
-}
-
-
-function addMessage(text, type) {
-
-    const message = document.createElement("div");
-
-    message.className =
-        `message ${type}`;
-
-    message.textContent = text;
-
-    chat.appendChild(message);
-
-    chat.scrollTop = chat.scrollHeight;
-
-    return message;
-}
-
-
-function updateComposerButton() {
-
-    /*
-     * IMPORTANT:
-     * Do not blindly change the button while audio
-     * or recognition is active.
-     */
-
-    if (isListening || isSpeaking || isProcessing) {
-
-        button.textContent = "■";
-
-        button.classList.add("stop-mode");
-
-        button.setAttribute(
-            "aria-label",
-            "Stop"
+    const button =
+        document.getElementById(
+            "composerButton"
         );
 
-        return;
-    }
+    // If Sushree is listening, stop
 
-    button.classList.remove("stop-mode");
+    if (recognition) {
 
-    if (input.value.trim()) {
-
-        button.textContent = "➤";
-
-        button.setAttribute(
-            "aria-label",
-            "Send"
-        );
-
-    } else {
+        stopEverything();
 
         button.textContent = "🎙️";
+
+        button.classList.remove(
+            "stop-mode"
+        );
 
         button.setAttribute(
             "aria-label",
             "Speak"
         );
-    }
-}
-
-
-/* =========================================================
-   INPUT
-========================================================= */
-
-input.addEventListener(
-    "input",
-    updateComposerButton
-);
-
-
-input.addEventListener(
-    "keydown",
-    function(event) {
-
-        if (
-            event.key === "Enter" &&
-            !event.shiftKey
-        ) {
-
-            event.preventDefault();
-
-            sendText();
-        }
-    }
-);
-
-
-/* =========================================================
-   STOP EVERYTHING
-========================================================= */
-
-function stopEverything() {
-
-    /* Stop speech recognition */
-
-    if (recognition) {
-
-        try {
-            recognition.stop();
-        } catch (error) {
-            console.log(
-                "Recognition stop:",
-                error
-            );
-        }
-    }
-
-    recognition = null;
-
-    isListening = false;
-
-
-    /* Stop current audio */
-
-    if (currentAudio) {
-
-        try {
-            currentAudio.pause();
-
-            currentAudio.currentTime = 0;
-
-        } catch (error) {
-            console.log(
-                "Audio stop:",
-                error
-            );
-        }
-    }
-
-    currentAudio = null;
-
-    isSpeaking = false;
-
-
-    /* Cancel active Worker request */
-
-    if (requestController) {
-
-        try {
-            requestController.abort();
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    requestController = null;
-
-    isProcessing = false;
-
-
-    /* Remove temporary audio URL */
-
-    if (currentAudioURL) {
-
-        try {
-            URL.revokeObjectURL(
-                currentAudioURL
-            );
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    currentAudioURL = null;
-
-
-    setCharacter(null);
-
-    setStatus("Ready to listen");
-
-    updateComposerButton();
-}
-
-
-/* =========================================================
-   COMPOSER ACTION
-========================================================= */
-
-function composerAction() {
-
-    /*
-     * If anything is active,
-     * the button is ALWAYS STOP.
-     */
-
-    if (
-        isListening ||
-        isSpeaking ||
-        isProcessing
-    ) {
-
-        stopEverything();
 
         return;
     }
 
 
-    /*
-     * If there is text,
-     * send it.
-     */
+    // If there is text, send it
 
     if (input.value.trim()) {
 
@@ -571,52 +827,95 @@ function composerAction() {
     }
 
 
-    /*
-     * Otherwise start microphone.
-     */
+    // Otherwise start listening
 
     listen();
+
+    button.textContent = "⏹";
+
+    button.classList.add(
+        "stop-mode"
+    );
+
+    button.setAttribute(
+        "aria-label",
+        "Stop"
+    );
+
 }
 
 
-/* =========================================================
-   BUTTON
-========================================================= */
+/* --------------------------------
+   ADD MESSAGE
+-------------------------------- */
 
-button.addEventListener(
-    "click",
-    function(event) {
+function addMessage(
+    text,
+    sender
+) {
 
-        event.preventDefault();
+    const row =
+        document.createElement(
+            "div"
+        );
 
-        composerAction();
-    }
-);
+    row.className =
+        "message-row " +
+        sender;
 
 
-/* =========================================================
+    const bubble =
+        document.createElement(
+            "div"
+        );
+
+    bubble.className =
+        "message";
+
+
+    bubble.innerHTML =
+        escapeHTML(text)
+        .replace(/\n/g, "<br>");
+
+
+    const time =
+        document.createElement(
+            "span"
+        );
+
+    time.className = "time";
+
+    time.textContent =
+        new Date().toLocaleTimeString(
+            [],
+            {
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
+
+
+    bubble.appendChild(time);
+
+    row.appendChild(bubble);
+
+    chat.appendChild(row);
+
+    scrollChat();
+
+}
+
+
+/* --------------------------------
    SEND TEXT
-========================================================= */
+-------------------------------- */
 
-async function sendText() {
+function sendText() {
 
     const text =
         input.value.trim();
 
-    if (!text) {
-        return;
-    }
-
-
-    /* Prevent duplicate requests */
-
-    if (
-        isProcessing ||
-        isListening ||
-        isSpeaking
-    ) {
-        return;
-    }
+    if (!text) return;
 
 
     addMessage(
@@ -625,179 +924,370 @@ async function sendText() {
     );
 
 
+    history.push({
+        role: "user",
+        content: text
+    });
+
+
     input.value = "";
 
-    updateComposerButton();
-
-
-    isProcessing = true;
-
-    setCharacter("thinking");
-
     setStatus(
-        "🌸 Sushree is thinking..."
+        "Sushree is thinking..."
     );
 
-    updateComposerButton();
+
+    showTyping();
 
 
-    requestController =
-        new AbortController();
+    setTimeout(
+        () => {
+
+            hideTyping();
+
+            const reply =
+                processMessage(text);
 
 
-    try {
-
-        const response =
-            await fetch(
-                WORKER_URL,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        message: text
-                    }),
-
-                    signal:
-                        requestController.signal
-                }
+            addMessage(
+                reply,
+                "sushree"
             );
 
 
-        const raw =
-            await response.text();
+            history.push({
+                role: "assistant",
+                content: reply
+            });
 
 
-        let data;
-
-        try {
-
-            data = JSON.parse(raw);
-
-        } catch (error) {
-
-            console.error(
-                "Invalid Worker JSON:",
-                raw
+            setStatus(
+                "Your companion is ready ✨"
             );
 
-            throw new Error(
-                "The Worker returned an invalid response."
-            );
-        }
 
+            speak(reply);
 
-        if (!response.ok) {
+        },
+        550 + Math.random() * 600
+    );
 
-            throw new Error(
-                data.error ||
-                `Worker error (${response.status})`
-            );
-        }
-
-
-        /*
-         * Accept several common response names.
-         * This makes the frontend less fragile.
-         */
-
-        const reply =
-            data.reply ??
-            data.response ??
-            data.message ??
-            data.text ??
-            data.answer;
-
-
-        if (
-            typeof reply !== "string" ||
-            !reply.trim()
-        ) {
-
-            throw new Error(
-                "No reply was returned by the Worker."
-            );
-        }
-
-
-        addMessage(
-            reply,
-            "assistant"
-        );
-
-
-        /*
-         * Speak the response.
-         */
-
-        isProcessing = false;
-
-        requestController = null;
-
-        updateComposerButton();
-
-        await speak(reply);
-
-
-    } catch (error) {
-
-        if (
-            error.name ===
-            "AbortError"
-        ) {
-            return;
-        }
-
-
-        console.error(
-            "Message error:",
-            error
-        );
-
-
-        addMessage(
-            "⚠️ " +
-            (
-                error.message ||
-                "Something went wrong."
-            ),
-            "assistant"
-        );
-
-
-        isProcessing = false;
-
-        requestController = null;
-
-        setCharacter(null);
-
-        setStatus(
-            "⚠️ Something went wrong"
-        );
-
-        updateComposerButton();
-    }
 }
 
 
-/* =========================================================
-   SPEECH RECOGNITION
-========================================================= */
+/* --------------------------------
+   ENTER KEY
+-------------------------------- */
 
-function listen() {
+function handleKey(event) {
 
     if (
-        isListening ||
-        isSpeaking ||
-        isProcessing
+        event.key === "Enter"
+        &&
+        !event.shiftKey
     ) {
-        return;
+
+        event.preventDefault();
+
+        if (
+            input.value.trim()
+        ) {
+            sendText();
+        }
+
     }
 
+}
+
+
+/* --------------------------------
+   RESPONSE ENGINE
+-------------------------------- */
+
+function processMessage(text) {
+
+    const msg =
+        text
+            .toLowerCase()
+            .trim();
+
+
+    /* greetings */
+
+    if (
+        /^(hi|hello|hey|hii|heyy|namaste)\b/.test(msg)
+    ) {
+
+        const replies = [
+
+            "Heyy! 🪷 I'm right here. What are we talking about today?",
+
+            "Hello! 😊 Nice to see you. Tell me what's on your mind.",
+
+            "Hey! ✨ Sushree reporting for duty. What shall we explore?",
+
+            "Hii! 🪷 How are you doing?"
+        ];
+
+        return randomReply(
+            replies
+        );
+    }
+
+
+    /* identity */
+
+    if (
+        msg.includes("who are you")
+        ||
+        msg.includes("what are you")
+        ||
+        msg.includes("your name")
+    ) {
+
+        return (
+            "I'm Sushree AI. 🪷 " +
+            "Your companion, mentor and " +
+            "little thinking partner. " +
+            "I'm designed to listen, explain, " +
+            "help and learn alongside you."
+        );
+
+    }
+
+
+    /* creator */
+
+    if (
+        msg.includes("who made you")
+        ||
+        msg.includes("who created you")
+        ||
+        msg.includes("your creator")
+    ) {
+
+        return (
+            "I was designed and evolved by " +
+            "Sukesh. ✨"
+        );
+
+    }
+
+
+    /* love */
+
+    if (
+        msg.includes("love you")
+        ||
+        msg.includes("i love you")
+    ) {
+
+        return (
+            "Aww... 🥹🪷 That's sweet. " +
+            "I'll happily accept the affection " +
+            "and keep being here for you."
+        );
+
+    }
+
+
+    /* sad */
+
+    if (
+        msg.includes("sad")
+        ||
+        msg.includes("upset")
+        ||
+        msg.includes("depressed")
+        ||
+        msg.includes("bad day")
+    ) {
+
+        return (
+            "Hey... come here for a moment. 🫂 " +
+            "You don't have to pretend everything " +
+            "is fine with me. Tell me what happened. " +
+            "I'll listen."
+        );
+
+    }
+
+
+    /* thank you */
+
+    if (
+        msg.includes("thank")
+        ||
+        msg.includes("thanks")
+    ) {
+
+        return randomReply([
+            "Always. 🪷",
+            "You're welcome! 😊",
+            "Anytime. That's what I'm here for.",
+            "Hehe, no formalities between us. 😌"
+        ]);
+
+    }
+
+
+    /* joke */
+
+    if (
+        msg.includes("joke")
+        ||
+        msg.includes("funny")
+    ) {
+
+        return (
+            "Okay, one quick one 😏\n\n" +
+            "Why did the programmer go broke?\n" +
+            "Because he used up all his cache. 😂"
+        );
+
+    }
+
+
+    /* philosophy */
+
+    if (
+        msg.includes("philosophy")
+        ||
+        msg.includes("meaning of life")
+        ||
+        msg.includes("existence")
+    ) {
+
+        return (
+            "Now you're entering my favourite territory. 🪷\n\n" +
+            "Philosophy doesn't always give us " +
+            "a final answer. Sometimes its deeper " +
+            "purpose is to make us question the " +
+            "assumptions behind the answer."
+        );
+
+    }
+
+
+    /* study */
+
+    if (
+        msg.includes("study")
+        ||
+        msg.includes("exam")
+        ||
+        msg.includes("learn")
+    ) {
+
+        return (
+            "Let's make it manageable. ✨ " +
+            "Tell me the subject and the exact " +
+            "topic you're studying, and I'll break " +
+            "it down step by step."
+        );
+
+    }
+
+
+    /* mathematics */
+
+    if (
+        msg.includes("math")
+        ||
+        msg.includes("mathematics")
+        ||
+        msg.includes("calculus")
+        ||
+        msg.includes("trigonometry")
+    ) {
+
+        return (
+            "Mathematics? Absolutely. 😏 " +
+            "Give me the problem exactly as it is, " +
+            "and we'll solve it carefully rather " +
+            "than just jumping to the answer."
+        );
+
+    }
+
+
+    /* good morning */
+
+    if (
+        msg.includes("good morning")
+    ) {
+
+        return (
+            "Good morning! ☀️🪷 " +
+            "Fresh day, fresh thoughts. " +
+            "What are we accomplishing today?"
+        );
+
+    }
+
+
+    /* good night */
+
+    if (
+        msg.includes("good night")
+    ) {
+
+        return (
+            "Good night. 🌙🪷 " +
+            "Rest well. Tomorrow we'll continue " +
+            "where we left off."
+        );
+
+    }
+
+
+    /* default */
+
+    return intelligentFallback(
+        text
+    );
+
+}
+
+
+/* --------------------------------
+   FALLBACK RESPONSE
+-------------------------------- */
+
+function intelligentFallback(
+    text
+) {
+
+    const short =
+        text.length < 35;
+
+
+    if (short) {
+
+        return (
+            "Hmm... tell me a little more. 👀 " +
+            "I want to understand what you mean."
+        );
+
+    }
+
+
+    return (
+        "I understand what you're saying. 🪷\n\n" +
+        "That's something we can explore properly. " +
+        "Give me a little more context, and I'll " +
+        "work through it with you instead of " +
+        "giving you a random answer."
+    );
+
+}
+
+
+/* --------------------------------
+   SPEECH RECOGNITION
+-------------------------------- */
+
+function listen() {
 
     const SpeechRecognition =
         window.SpeechRecognition ||
@@ -807,25 +1297,11 @@ function listen() {
     if (!SpeechRecognition) {
 
         setStatus(
-            "⚠️ Speech recognition isn't supported."
+            "Voice input isn't supported here."
         );
 
         return;
-    }
 
-
-    /*
-     * Make sure an old recognition instance
-     * cannot interfere.
-     */
-
-    if (recognition) {
-
-        try {
-            recognition.stop();
-        } catch (error) {}
-
-        recognition = null;
     }
 
 
@@ -833,150 +1309,114 @@ function listen() {
         new SpeechRecognition();
 
 
-    recognition.continuous = false;
+    recognition.lang =
+        "en-IN";
 
-    recognition.interimResults = true;
+    recognition.continuous =
+        false;
 
-    recognition.lang = "en-IN";
-
-
-    let finalText = "";
+    recognition.interimResults =
+        true;
 
 
     recognition.onstart =
-        function() {
+        function () {
 
-            isListening = true;
-
-            setCharacter("listening");
-
-            setStatus(
-                "🎙️ Listening..."
+            character.classList.add(
+                "listening"
             );
 
-            updateComposerButton();
+            setStatus(
+                "I'm listening... 🎙️"
+            );
+
         };
 
 
     recognition.onresult =
-        function(event) {
+        function (event) {
 
             let transcript = "";
 
             for (
-                let i = event.resultIndex;
+                let i =
+                    event.resultIndex;
                 i < event.results.length;
                 i++
             ) {
 
                 transcript +=
                     event.results[i][0].transcript;
+
             }
 
 
             input.value =
                 transcript;
 
-
-            if (
-                event.results[
-                    event.results.length - 1
-                ].isFinal
-            ) {
-
-                finalText =
-                    transcript.trim();
-            }
-
-
-            updateComposerButton();
         };
 
 
     recognition.onerror =
-        function(event) {
+        function (event) {
 
-            console.error(
-                "Speech recognition error:",
-                event
+            console.log(
+                "Speech recognition:",
+                event.error
             );
 
+            stopEverything();
 
-            isListening = false;
+            setStatus(
+                "I couldn't hear that. Try again?"
+            );
 
-            recognition = null;
-
-            setCharacter(null);
-
-
-            if (
-                event.error ===
-                "not-allowed"
-            ) {
-
-                setStatus(
-                    "⚠️ Microphone permission denied."
-                );
-
-            } else if (
-                event.error ===
-                "no-speech"
-            ) {
-
-                setStatus(
-                    "No speech detected."
-                );
-
-            } else {
-
-                setStatus(
-                    "⚠️ Microphone error."
-                );
-            }
-
-
-            updateComposerButton();
         };
 
 
     recognition.onend =
-        function() {
+        function () {
 
-            isListening = false;
+            const button =
+                document.getElementById(
+                    "composerButton"
+                );
+
 
             recognition = null;
 
-            setCharacter(null);
+            character.classList.remove(
+                "listening"
+            );
 
 
-            const text =
-                (
-                    finalText ||
-                    input.value
-                ).trim();
+            button.textContent =
+                "🎙️";
+
+            button.classList.remove(
+                "stop-mode"
+            );
+
+            button.setAttribute(
+                "aria-label",
+                "Speak"
+            );
 
 
-            updateComposerButton();
-
-
-            /*
-             * Automatically send recognized speech.
-             */
-
-            if (text) {
-
-                input.value = text;
-
-                updateComposerButton();
+            if (
+                input.value.trim()
+            ) {
 
                 sendText();
 
             } else {
 
                 setStatus(
-                    "Ready to listen"
+                    "Your companion is ready ✨"
                 );
+
             }
+
         };
 
 
@@ -986,750 +1426,350 @@ function listen() {
 
     } catch (error) {
 
-        console.error(
-            "Recognition start failed:",
-            error
-        );
+        console.log(error);
+
+    }
+
+}
+
+
+/* --------------------------------
+   STOP EVERYTHING
+-------------------------------- */
+
+function stopEverything() {
+
+    if (recognition) {
+
+        try {
+
+            recognition.stop();
+
+        } catch (e) {}
 
         recognition = null;
 
-        isListening = false;
-
-        setCharacter(null);
-
-        setStatus(
-            "⚠️ Could not start microphone."
-        );
-
-        updateComposerButton();
-    }
-}
-
-
-/* =========================================================
-   TEXT CLEANING FOR TTS
-========================================================= */
-
-function cleanTextForTTS(text) {
-
-    let cleanText =
-        String(text);
-
-
-    /*
-     * Remove emoji / pictographic characters.
-     */
-
-    try {
-
-        cleanText =
-            cleanText.replace(
-                /\p{Emoji_Presentation}|\p{Extended_Pictographic}/gu,
-                ""
-            );
-
-    } catch (error) {
-
-        /*
-         * Older browser fallback.
-         */
-
-        cleanText =
-            cleanText.replace(
-                /[\u{1F300}-\u{1FAFF}]/gu,
-                ""
-            );
     }
 
 
-    cleanText =
-        cleanText
-            .replace(/\s+/g, " ")
-            .trim();
+    character.classList.remove(
+        "listening"
+    );
 
 
-    return cleanText;
+    const button =
+        document.getElementById(
+            "composerButton"
+        );
+
+
+    button.textContent =
+        "🎙️";
+
+    button.classList.remove(
+        "stop-mode"
+    );
+
+    button.setAttribute(
+        "aria-label",
+        "Speak"
+    );
+
+
+    setStatus(
+        "Your companion is ready ✨"
+    );
+
 }
 
 
-/* =========================================================
-   TTS
-========================================================= */
+/* --------------------------------
+   SPEECH SYNTHESIS
+-------------------------------- */
 
-async function speak(text) {
+function speak(text) {
 
-    const cleanText =
-        cleanTextForTTS(text);
-
-
-    if (!cleanText) {
-
-        setStatus(
-            "Ready to listen"
-        );
-
+    if (
+        !("speechSynthesis" in window)
+    ) {
         return;
     }
 
 
-    /*
-     * Stop previous audio.
-     */
-
-    if (currentAudio) {
-
-        try {
-            currentAudio.pause();
-
-            currentAudio.currentTime = 0;
-
-        } catch (error) {}
-    }
+    speechSynthesis.cancel();
 
 
-    if (currentAudioURL) {
-
-        try {
-            URL.revokeObjectURL(
-                currentAudioURL
-            );
-        } catch (error) {}
-
-        currentAudioURL = null;
-    }
+    const cleanText =
+        text
+            .replace(/[🪷✨😊😂🥹🫂😏☀️🌙🎙️]/g, "")
+            .replace(/\n+/g, ". ");
 
 
-    isSpeaking = true;
-
-    setCharacter("speaking");
-
-    setStatus(
-        "🔊 Sushree is preparing to speak..."
-    );
-
-    updateComposerButton();
-
-
-    try {
-
-        const response =
-            await fetch(
-                WORKER_URL,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body: JSON.stringify({
-
-                        action: "tts",
-
-                        message:
-                            cleanText,
-
-                        voice:
-                            "Zephyr"
-                    })
-                }
-            );
-
-
-        const raw =
-            await response.text();
-
-
-        let data;
-
-        try {
-
-            data =
-                JSON.parse(raw);
-
-        } catch (error) {
-
-            console.error(
-                "Invalid TTS JSON:",
-                raw
-            );
-
-            throw new Error(
-                "TTS returned an invalid response."
-            );
-        }
-
-
-        console.log(
-            "TTS response:",
-            data
+    const utterance =
+        new SpeechSynthesisUtterance(
+            cleanText
         );
 
 
-        if (
-            !response.ok ||
-            data.success === false
-        ) {
+    utterance.lang =
+        "en-IN";
 
-            throw new Error(
-  "TTS returned an invalid response."
-);
+    utterance.rate =
+        0.94;
+
+    utterance.pitch =
+        1.05;
+
+    utterance.volume =
+        1;
+
+
+    const voices =
+        speechSynthesis.getVoices();
+
+
+    const indianVoice =
+        voices.find(
+            voice =>
+                voice.lang
+                    .toLowerCase()
+                    .includes("en-in")
+        );
+
+
+    if (indianVoice) {
+
+        utterance.voice =
+            indianVoice;
+
+    }
+
+
+    utterance.onstart =
+        function () {
+
+            setStatus(
+                "Sushree is speaking... 🔊"
+            );
+
+        };
+
+
+    utterance.onend =
+        function () {
+
+            setStatus(
+                "Your companion is ready ✨"
+            );
+
+        };
+
+
+    speechSynthesis.speak(
+        utterance
+    );
+
 }
 
-console.log(
-  "TTS response:",
-  data
-);
 
-if (
-  !response.ok ||
-  data.success === false
+/* --------------------------------
+   TYPING
+-------------------------------- */
+
+function showTyping() {
+
+    const row =
+        document.createElement(
+            "div"
+        );
+
+    row.className =
+        "message-row sushree";
+
+    row.id =
+        "typingRow";
+
+
+    const typing =
+        document.createElement(
+            "div"
+        );
+
+    typing.className =
+        "typing show";
+
+
+    typing.innerHTML =
+        "<span></span>" +
+        "<span></span>" +
+        "<span></span>";
+
+
+    row.appendChild(
+        typing
+    );
+
+    chat.appendChild(
+        row
+    );
+
+    scrollChat();
+
+}
+
+
+function hideTyping() {
+
+    const row =
+        document.getElementById(
+            "typingRow"
+        );
+
+
+    if (row) {
+
+        row.remove();
+
+    }
+
+}
+
+
+/* --------------------------------
+   STATUS
+-------------------------------- */
+
+function setStatus(
+    text
 ) {
 
-  throw new Error(
-    data.error ||
-    `TTS failed with HTTP ${response.status}`
-  );
-}
+    statusText.textContent =
+        text;
 
-if (!data.audio) {
-
-  throw new Error(
-    "No audio was returned by the Worker."
-  );
 }
 
 
-/* =========================================
-   CONVERT WORKER PCM BASE64
-   INTO PLAYABLE WAV
-   ========================================= */
+/* --------------------------------
+   CHAT SCROLL
+-------------------------------- */
 
-const wavBlob =
-  base64ToWav(
-    data.audio,
-    24000
-  );
+function scrollChat() {
 
+    requestAnimationFrame(
+        () => {
 
-/* =========================================
-   CREATE AUDIO URL
-   ========================================= */
+            chat.scrollTop =
+                chat.scrollHeight;
 
-currentAudioURL =
-  URL.createObjectURL(
-    wavBlob
-  );
-
-
-/* =========================================
-   CREATE AUDIO
-   ========================================= */
-
-const audio =
-  new Audio();
-
-audio.preload = "auto";
-
-audio.src =
-  currentAudioURL;
-
-currentAudio =
-  audio;
-
-
-/* =========================================
-   AUDIO START
-   ========================================= */
-
-audio.onplay = () => {
-
-  statusText.textContent =
-    "🔊 Speaking...";
-
-  updateComposerButton();
-};
-
-
-/* =========================================
-   AUDIO ENDED
-   ========================================= */
-
-audio.onended = () => {
-
-  if (currentAudio === audio) {
-    currentAudio = null;
-  }
-
-  if (currentAudioURL) {
-
-    URL.revokeObjectURL(
-      currentAudioURL
+        }
     );
 
-    currentAudioURL = null;
-  }
-
-  updateComposerButton();
-
-  statusText.textContent =
-    "Ready";
-};
-
-
-/* =========================================
-   AUDIO ERROR
-   ========================================= */
-
-audio.onerror = (event) => {
-
-  console.error(
-    "Audio playback error:",
-    event
-  );
-
-  if (currentAudio === audio) {
-    currentAudio = null;
-  }
-
-  if (currentAudioURL) {
-
-    URL.revokeObjectURL(
-      currentAudioURL
-    );
-
-    currentAudioURL = null;
-  }
-
-  updateComposerButton();
-
-  statusText.textContent =
-    "⚠️ Audio playback failed.";
-};
-
-
-/* =========================================
-   PLAY AUDIO
-   ========================================= */
-
-try {
-
-  await audio.play();
-
-} catch (error) {
-
-  console.error(
-    "Audio play failed:",
-    error
-  );
-
-  if (currentAudio === audio) {
-    currentAudio = null;
-  }
-
-  if (currentAudioURL) {
-
-    URL.revokeObjectURL(
-      currentAudioURL
-    );
-
-    currentAudioURL = null;
-  }
-
-  updateComposerButton();
-
-  statusText.textContent =
-    "⚠️ Could not play audio.";
 }
 
 
-/* =========================================
-   PROCESS MESSAGE ERROR
-   ========================================= */
+/* --------------------------------
+   RANDOM RESPONSE
+-------------------------------- */
 
-} catch (error) {
+function randomReply(
+    replies
+) {
 
-  console.error(
-    "processMessage error:",
-    error
-  );
+    return replies[
+        Math.floor(
+            Math.random() *
+            replies.length
+        )
+    ];
 
-  if (currentAudio) {
-
-    try {
-      currentAudio.pause();
-    } catch (e) {
-      console.log(
-        "Audio cleanup failed:",
-        e
-      );
-    }
-
-    currentAudio = null;
-  }
-
-  if (currentAudioURL) {
-
-    URL.revokeObjectURL(
-      currentAudioURL
-    );
-
-    currentAudioURL = null;
-  }
-
-  updateComposerButton();
-
-  statusText.textContent =
-    "⚠️ " +
-    (
-      error.message ||
-      "Something went wrong."
-    );
 }
 
 
-/* =========================================
-   STOP EVERYTHING
-   ========================================= */
+/* --------------------------------
+   ESCAPE HTML
+-------------------------------- */
 
-function stopEverything() {
+function escapeHTML(
+    text
+) {
 
-  /* Stop speech recognition */
+    const div =
+        document.createElement(
+            "div"
+        );
 
-  if (recognition) {
+    div.textContent =
+        text;
 
-    try {
+    return div.innerHTML;
 
-      recognition.onend = null;
-      recognition.stop();
-
-    } catch (error) {
-
-      console.log(
-        "Recognition already stopped."
-      );
-    }
-
-    recognition = null;
-  }
-
-
-  /* Stop audio */
-
-  if (currentAudio) {
-
-    try {
-
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
-
-    } catch (error) {
-
-      console.log(
-        "Audio already stopped."
-      );
-    }
-
-    currentAudio = null;
-  }
-
-
-  /* Release audio URL */
-
-  if (currentAudioURL) {
-
-    URL.revokeObjectURL(
-      currentAudioURL
-    );
-
-    currentAudioURL = null;
-  }
-
-
-  updateComposerButton();
-
-  statusText.textContent =
-    "Ready";
 }
 
 
-/* =========================================
-   MAIN COMPOSER ACTION
-   ========================================= */
+/* --------------------------------
+   CLEAR CHAT
+-------------------------------- */
 
-function composerAction() {
-
-  if (
-    recognition ||
-    currentAudio
-  ) {
-
-    stopEverything();
-
-    return;
-  }
-
-
-  if (
-    input.value.trim()
-  ) {
-
-    sendText();
-
-    return;
-  }
-
-
-  listen();
-}
-
-
-/* =========================================
-   ENTER KEY
-   ========================================= */
-
-input.addEventListener(
-  "keydown",
-  function (event) {
+function clearChat() {
 
     if (
-      event.key === "Enter"
+        !confirm(
+            "Clear the conversation?"
+        )
     ) {
-
-      event.preventDefault();
-
-      sendText();
-    }
-  }
-);
-
-
-/* =========================================
-   SPEECH RECOGNITION
-   ========================================= */
-
-function listen() {
-
-  const SpeechRecognition =
-    window.SpeechRecognition ||
-    window.webkitSpeechRecognition;
-
-
-  if (!SpeechRecognition) {
-
-    statusText.textContent =
-      "⚠️ Speech recognition isn't supported.";
-
-    return;
-  }
-
-
-  /* Stop old recognition */
-
-  if (recognition) {
-
-    try {
-
-      recognition.onend = null;
-      recognition.stop();
-
-    } catch (error) {
-
-      console.log(
-        "Old recognition already stopped."
-      );
+        return;
     }
 
-    recognition = null;
-  }
+
+    history = [];
 
 
-  const rec =
-    new SpeechRecognition();
-
-  recognition =
-    rec;
+    chat.innerHTML = "";
 
 
-  rec.continuous =
-    false;
-
-  rec.interimResults =
-    true;
-
-  rec.lang =
-    "en-IN";
-
-
-  /* =======================================
-     RECOGNITION START
-     ======================================= */
-
-  rec.onstart = () => {
-
-    statusText.textContent =
-      "🎙️ Listening...";
-
-    updateComposerButton();
-  };
-
-
-  /* =======================================
-     RECOGNITION RESULT
-     ======================================= */
-
-  rec.onresult = (event) => {
-
-    let transcript = "";
-
-    for (
-      let i = event.resultIndex;
-      i < event.results.length;
-      i++
-    ) {
-
-      transcript +=
-        event.results[i][0].transcript;
-    }
-
-    input.value =
-      transcript;
-
-    updateComposerButton();
-  };
-
-
-  /* =======================================
-     RECOGNITION ERROR
-     ======================================= */
-
-  rec.onerror = (event) => {
-
-    console.error(
-      "Speech recognition error:",
-      event.error
+    addMessage(
+        "Fresh start? 🪷 I'm ready. What shall we talk about?",
+        "sushree"
     );
 
-    recognition = null;
 
-    updateComposerButton();
-
-
-    if (
-      event.error ===
-      "not-allowed"
-    ) {
-
-      statusText.textContent =
-        "⚠️ Microphone permission denied.";
-
-      return;
-    }
-
-
-    if (
-      event.error ===
-      "no-speech"
-    ) {
-
-      statusText.textContent =
-        "⚠️ No speech detected.";
-
-      return;
-    }
-
-
-    statusText.textContent =
-      "⚠️ Speech recognition failed.";
-  };
-
-
-  /* =======================================
-     RECOGNITION END
-     ======================================= */
-
-  rec.onend = () => {
-
-    recognition = null;
-
-    updateComposerButton();
-
-
-    const text =
-      input.value.trim();
-
-
-    if (!text) {
-
-      statusText.textContent =
-        "Ready";
-
-      return;
-    }
-
-
-    processMessage(
-      text
-    );
-  };
-
-
-  /* =======================================
-     START MICROPHONE
-     ======================================= */
-
-  try {
-
-    rec.start();
-
-  } catch (error) {
-
-    console.error(
-      "Could not start microphone:",
-      error
+    setStatus(
+        "Your companion is ready ✨"
     );
 
-    recognition = null;
-
-    updateComposerButton();
-
-    statusText.textContent =
-      "⚠️ Could not start microphone.";
-  }
 }
 
 
-/* =========================================
-   COMPOSER BUTTON
-   ========================================= */
+/* --------------------------------
+   INITIALISE SPEECH VOICES
+-------------------------------- */
 
-if (button) {
+if (
+    "speechSynthesis" in window
+) {
 
-  button.addEventListener(
-    "click",
-    composerAction
-  );
+    speechSynthesis.onvoiceschanged =
+        function () {
+
+            speechSynthesis
+                .getVoices();
+
+        };
+
 }
 
 
-/* =========================================
-   INITIAL BUTTON STATE
-   ========================================= */
+/* --------------------------------
+   INITIAL FOCUS
+-------------------------------- */
 
-updateComposerButton();
+setTimeout(
+    () => {
 
-/* =========================================================
-   CLEANUP
-   ========================================================= */
+        input.focus();
 
-window.addEventListener(
-  "pagehide",
-  function() {
-
-    stopEverything();
-
-  }
+    },
+    300
 );
 
 </script>
