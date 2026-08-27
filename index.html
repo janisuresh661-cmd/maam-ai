@@ -2,615 +2,1512 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sushree AI</title>
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-  <style>
+<title>Sushree</title>
+
+<style>
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont,
+                 "Segoe UI", sans-serif;
+    background: #0b0d10;
+    color: #f4f4f5;
 }
 
 body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: Arial, sans-serif;
-  color: white;
-  background:
-    radial-gradient(circle at 50% 0%, #243b64 0%, #080b14 55%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    display: flex;
+    justify-content: center;
 }
 
 .app {
-  width: 94%;
-  max-width: 520px;
-  min-height: 92vh;
-  padding: 22px;
-  border-radius: 28px;
-  background: rgba(15, 23, 42, 0.96);
-  border: 1px solid #334155;
-  box-shadow: 0 0 50px rgba(92, 232, 255, .12);
-  display: flex;
-  flex-direction: column;
+    width: 100%;
+    max-width: 700px;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: #101318;
 }
 
+/* =========================
+   HEADER
+========================= */
+
 .header {
-  text-align: center;
+    padding: 18px 20px 12px;
+    text-align: center;
+    border-bottom: 1px solid #242830;
 }
 
 .header h1 {
-  margin: 5px 0;
-  font-size: 32px;
-  color: #5ce8ff;
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
 }
 
 .header p {
-  margin: 5px 0 18px;
-  color: #94a3b8;
+    margin: 5px 0 0;
+    font-size: 13px;
+    color: #8d949f;
+}
+
+/* =========================
+   CHARACTER
+========================= */
+
+.character-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 28px 20px 15px;
 }
 
 .character {
-  width: 170px;
-  height: 170px;
-  margin: 5px auto 15px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 80px;
-  background: radial-gradient(circle, #334b78, #08111f);
-  border: 3px solid #5ce8ff;
-  box-shadow: 0 0 35px rgba(92, 232, 255, .35);
-  transition: .3s;
-    overflow: hidden;
+    width: 125px;
+    height: 125px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #181c23;
+    border: 2px solid #303641;
+    font-size: 48px;
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        border-color .25s ease;
 }
 
-.character img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top;
+.character.thinking {
+    animation: thinking 1.3s infinite ease-in-out;
 }
 
 .character.listening {
-  animation: listenPulse 1.2s infinite;
+    border-color: #5e9cff;
+    box-shadow: 0 0 25px rgba(94,156,255,.25);
+    animation: listening 1.2s infinite ease-in-out;
 }
 
-  .character.thinking {
-  animation: thinkingPulse 1.5s infinite ease-in-out;
-}
-
-@keyframes thinkingPulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 0 35px rgba(92, 232, 255, .35);
-  }
-
-  50% {
-    transform: scale(1.025);
-    box-shadow: 0 0 48px rgba(167, 139, 250, .65);
-  }
-}
 .character.speaking {
-  animation: speakPulse .45s infinite alternate;
+    border-color: #72d6a0;
+    box-shadow: 0 0 30px rgba(114,214,160,.25);
+    animation: speaking .8s infinite alternate;
 }
 
-@keyframes listenPulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 0 35px rgba(92, 232, 255, .35);
-  }
-
-  50% {
-    transform: scale(1.04);
-    box-shadow: 0 0 60px rgba(92, 232, 255, .85);
-  }
+@keyframes thinking {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
 }
 
-@keyframes speakPulse {
-  from {
-    transform: scale(1);
-    box-shadow: 0 0 35px rgba(92, 232, 255, .35);
-  }
-
-  to {
-    transform: scale(1.045);
-    box-shadow: 0 0 55px rgba(92, 232, 255, .75);
-  }
+@keyframes listening {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
 }
+
+@keyframes speaking {
+    from { transform: scale(1); }
+    to   { transform: scale(1.07); }
+}
+
+/* =========================
+   STATUS
+========================= */
 
 .status {
-  text-align: center;
-  min-height: 22px;
-  color: #67e8f9;
-  margin-bottom: 12px;
+    min-height: 42px;
+    padding: 8px 20px;
+    text-align: center;
+    color: #aab0ba;
+    font-size: 14px;
 }
 
+/* =========================
+   CHAT
+========================= */
+
 .chat {
-  flex: 1;
-  min-height: 220px;
-  max-height: 340px;
-  overflow-y: auto;
-  padding: 5px;
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 16px 20px;
+    scroll-behavior: smooth;
 }
 
 .message {
-  padding: 12px 15px;
-  margin: 9px 0;
-  border-radius: 16px;
-  line-height: 1.5;
-  max-width: 85%;
+    max-width: 85%;
+    margin: 8px 0;
+    padding: 11px 14px;
+    border-radius: 16px;
+    line-height: 1.45;
+    font-size: 15px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
 }
 
-.sushree {
-  background: #1e293b;
-  margin-right: 35px;
+.message.user {
+    margin-left: auto;
+    background: #29313d;
+    border-bottom-right-radius: 5px;
 }
 
-.user {
-  background: #164e63;
-  margin-left: 35px;
-  text-align: right;
+.message.assistant {
+    margin-right: auto;
+    background: #181c23;
+    border: 1px solid #282e38;
+    border-bottom-left-radius: 5px;
 }
 
-/* Modern AI Composer */
+/* =========================
+   COMPOSER
+========================= */
 
 .composer {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 12px;
-  padding: 6px 7px 6px 16px;
-  border: 1px solid #334155;
-  border-radius: 28px;
-  background: #0f172a;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    border-top: 1px solid #242830;
+    background: #101318;
 }
 
-.composer:focus-within {
-  border-color: #5ce8ff;
-  box-shadow: 0 0 0 3px rgba(92, 232, 255, 0.08);
+.input {
+    flex: 1;
+    min-height: 48px;
+    max-height: 130px;
+    resize: none;
+    border: 1px solid #303641;
+    outline: none;
+    border-radius: 16px;
+    background: #181c23;
+    color: #fff;
+    padding: 13px 14px;
+    font: inherit;
 }
 
-.composer input {
-  flex: 1;
-  min-width: 0;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: white;
-  font-size: 15px;
-  padding: 9px 0;
+.input:focus {
+    border-color: #505967;
 }
 
-.composer input::placeholder {
-  color: #64748b;
+.input::placeholder {
+    color: #747c87;
 }
 
 .composer-button {
-  width: 42px;
-  height: 42px;
-  min-width: 42px;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #5ce8ff;
-  color: #08111f;
-  font-size: 18px;
-  cursor: pointer;
-  box-shadow: 0 2px 10px rgba(92, 232, 255, 0.25);
-  transition: transform 0.2s ease,
-              background 0.2s ease,
-              box-shadow 0.2s ease;
-}
-
-.composer-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 16px rgba(92, 232, 255, 0.35);
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    border: 0;
+    border-radius: 50%;
+    background: #e9edf2;
+    color: #101318;
+    font-size: 21px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition:
+        transform .15s ease,
+        background .15s ease;
 }
 
 .composer-button:active {
-  transform: scale(0.92);
+    transform: scale(.92);
+}
+
+.composer-button:disabled {
+    opacity: .55;
 }
 
 .composer-button.stop-mode {
-  background: #475569;
-  color: white;
-  box-shadow: 0 2px 10px rgba(71, 85, 105, 0.35);
+    background: #e45c5c;
+    color: white;
 }
 
-.footer {
-  text-align: center;
-  margin-top: 14px;
-  color: #64748b;
-  font-size: 11px;
-}
-/* Sushree feels alive */
-.character {
-  animation: naturalBreathing 4s ease-in-out infinite;
+/* =========================
+   SCROLLBAR
+========================= */
+
+.chat::-webkit-scrollbar {
+    width: 5px;
 }
 
-.character img {
-  transition: transform 0.4s ease, filter 0.4s ease;
+.chat::-webkit-scrollbar-thumb {
+    background: #343a44;
+    border-radius: 10px;
 }
-
-/* Gentle natural breathing */
-@keyframes naturalBreathing {
-  0%, 100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.015);
-  }
-}
-
-/* Soft idle glow */
-.character:not(.listening):not(.thinking):not(.speaking) {
-  box-shadow: 0 0 35px rgba(92, 232, 255, 0.35);
-}
-
-/* Thinking state */
-.character.thinking img {
-  transform: scale(1.02);
-  filter: brightness(1.05);
-}
-
-/* Speaking state */
-.character.speaking img {
-  transform: scale(1.025);
-  filter: brightness(1.1);
-}
-
-/* Listening state */
-.character.listening img {
-  transform: scale(1.015);
-  filter: brightness(1.08);
-}
-  </style>
+</style>
 </head>
 
 <body>
 
 <div class="app">
 
-  <div class="header">
-    <h1>Sushree AI</h1>
-    <p>Your interactive digital companion</p>
-  </div>
+    <header class="header">
+        <h1>Sushree</h1>
+        <p>Your personal AI assistant</p>
+    </header>
 
-  <div id="character" class="character">
-    <img src="Sushree.png" alt="Sushree">
-  </div>
+    <section class="character-area">
+        <div id="character" class="character">
+            🌸
+        </div>
+    </section>
 
-  <div id="status" class="status">
-    Ready to listen
-  </div>
-
-  <div id="chat" class="chat">
-
-    <div class="message sushree">
-      Hello! 👋 I'm Sushree.<br>
-      You can talk to me or type a message.
+    <div id="statusText" class="status">
+        Ready to listen
     </div>
 
-  </div>
+    <main id="chat" class="chat"></main>
 
-<div class="composer">
+    <div class="composer">
 
-  <input
-    id="input"
-    class="composer-input"
-    type="text"
-    placeholder="Talk to Sushree..."
-  >
+        <textarea
+            id="input"
+            class="input"
+            rows="1"
+            placeholder="Message Sushree..."
+            autocomplete="off"
+            spellcheck="true"></textarea>
 
-  <button
-    id="composerButton"
-    class="composer-button"
-    onclick="composerAction()"
-    aria-label="Speak"
-  >
-    🎙️
-  </button>
+        <button
+            id="composerButton"
+            class="composer-button"
+            type="button"
+            aria-label="Speak">
+            🎙️
+        </button>
 
-</div>
-
-<div class="footer">
-  Sushree AI • Designed & Evolved by Sukesh ✨
-</div>
+    </div>
 
 </div>
 
 <script>
 
 /* =========================================================
-   SUSHREE AI — COMPLETE SCRIPT
-   ========================================================= */
-
-/* ---------------------------
-   ELEMENTS
---------------------------- */
-
-const input = document.getElementById("input");
-const chat = document.getElementById("chat");
-const statusText = document.getElementById("status");
-const character = document.getElementById("character");
-const button = document.getElementById("composerButton");
-
-
-/* ---------------------------
    CONFIGURATION
---------------------------- */
+========================================================= */
 
 const WORKER_URL =
-  "https://spring-cake-3e86.janisuresh661.workers.dev";
+    "https://spring-cake-3e86.janisuresh661.workers.dev/";
 
 
-/* ---------------------------
+/* =========================================================
+   DOM
+========================================================= */
+
+const input =
+    document.getElementById("input");
+
+const button =
+    document.getElementById("composerButton");
+
+const statusText =
+    document.getElementById("statusText");
+
+const character =
+    document.getElementById("character");
+
+const chat =
+    document.getElementById("chat");
+
+
+/* =========================================================
    STATE
---------------------------- */
+========================================================= */
 
 let recognition = null;
 let currentAudio = null;
-let history = [];
+let currentAudioURL = null;
 
+let isListening = false;
+let isSpeaking = false;
+let isProcessing = false;
 
-/* ---------------------------
-   LOCAL MEMORY
---------------------------- */
-
-let memory = {};
-
-try {
-
-  memory = JSON.parse(
-    localStorage.getItem("sushreeMemory") || "{}"
-  );
-
-} catch (error) {
-
-  console.error("Memory loading error:", error);
-
-  memory = {};
-
-}
-
-
-function saveMemory() {
-
-  try {
-
-    localStorage.setItem(
-      "sushreeMemory",
-      JSON.stringify(memory)
-    );
-
-  } catch (error) {
-
-    console.error("Memory saving error:", error);
-
-  }
-
-}
-
-
-function remember(key, value) {
-
-  memory[key] = value;
-
-  saveMemory();
-
-}
+let requestController = null;
 
 
 /* =========================================================
-   CHAT MESSAGE
-   ========================================================= */
+   UTILITY
+========================================================= */
+
+function setStatus(text) {
+    statusText.textContent = text;
+}
+
+
+function setCharacter(mode) {
+
+    character.classList.remove(
+        "thinking",
+        "listening",
+        "speaking"
+    );
+
+    if (mode) {
+        character.classList.add(mode);
+    }
+}
+
 
 function addMessage(text, type) {
 
-  const message = document.createElement("div");
+    const message = document.createElement("div");
 
-  message.className = "message " + type;
+    message.className =
+        `message ${type}`;
 
-  /*
-    Basic formatting:
-    **bold**
-    # heading
-    ## heading
-    ### heading
-    line breaks
-  */
+    message.textContent = text;
 
-  let formatted = String(text);
+    chat.appendChild(message);
 
-  formatted = formatted
-    .replace(
-      /\*\*(.*?)\*\*/g,
-      "<strong>$1</strong>"
-    )
-    .replace(
-      /^### (.*)$/gm,
-      "<h3>$1</h3>"
-    )
-    .replace(
-      /^## (.*)$/gm,
-      "<h2>$1</h2>"
-    )
-    .replace(
-      /^# (.*)$/gm,
-      "<h1>$1</h1>"
-    )
-    .replace(
-      /\n/g,
-      "<br>"
-    );
+    chat.scrollTop = chat.scrollHeight;
 
-  message.innerHTML = formatted;
-
-  chat.appendChild(message);
-
-  chat.scrollTop = chat.scrollHeight;
+    return message;
 }
 
-
-/* =========================================================
-   COMPOSER BUTTON
-   ========================================================= */
 
 function updateComposerButton() {
 
-  if (!button) return;
+    /*
+     * IMPORTANT:
+     * Do not blindly change the button while audio
+     * or recognition is active.
+     */
 
+    if (isListening || isSpeaking || isProcessing) {
 
-  /*
-    If microphone or audio is active,
-    don't switch the button to Send.
-  */
+        button.textContent = "■";
 
-  if (recognition || currentAudio) {
+        button.classList.add("stop-mode");
 
-    return;
+        button.setAttribute(
+            "aria-label",
+            "Stop"
+        );
 
-  }
-
-
-  if (input.value.trim()) {
-
-    button.textContent = "➤";
-
-    button.classList.remove("stop-mode");
-
-    button.setAttribute(
-      "aria-label",
-      "Send"
-    );
-
-  } else {
-
-    button.textContent = "🎙️";
+        return;
+    }
 
     button.classList.remove("stop-mode");
 
-    button.setAttribute(
-      "aria-label",
-      "Speak"
-    );
+    if (input.value.trim()) {
 
-  }
+        button.textContent = "➤";
 
+        button.setAttribute(
+            "aria-label",
+            "Send"
+        );
+
+    } else {
+
+        button.textContent = "🎙️";
+
+        button.setAttribute(
+            "aria-label",
+            "Speak"
+        );
+    }
 }
 
 
+/* =========================================================
+   INPUT
+========================================================= */
+
 input.addEventListener(
-  "input",
-  updateComposerButton
+    "input",
+    updateComposerButton
+);
+
+
+input.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key === "Enter" &&
+            !event.shiftKey
+        ) {
+
+            event.preventDefault();
+
+            sendText();
+        }
+    }
 );
 
 
 /* =========================================================
-   MAIN COMPOSER ACTION
-   ========================================================= */
+   STOP EVERYTHING
+========================================================= */
+
+function stopEverything() {
+
+    /* Stop speech recognition */
+
+    if (recognition) {
+
+        try {
+            recognition.stop();
+        } catch (error) {
+            console.log(
+                "Recognition stop:",
+                error
+            );
+        }
+    }
+
+    recognition = null;
+
+    isListening = false;
+
+
+    /* Stop current audio */
+
+    if (currentAudio) {
+
+        try {
+            currentAudio.pause();
+
+            currentAudio.currentTime = 0;
+
+        } catch (error) {
+            console.log(
+                "Audio stop:",
+                error
+            );
+        }
+    }
+
+    currentAudio = null;
+
+    isSpeaking = false;
+
+
+    /* Cancel active Worker request */
+
+    if (requestController) {
+
+        try {
+            requestController.abort();
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    requestController = null;
+
+    isProcessing = false;
+
+
+    /* Remove temporary audio URL */
+
+    if (currentAudioURL) {
+
+        try {
+            URL.revokeObjectURL(
+                currentAudioURL
+            );
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    currentAudioURL = null;
+
+
+    setCharacter(null);
+
+    setStatus("Ready to listen");
+
+    updateComposerButton();
+}
+
+
+/* =========================================================
+   COMPOSER ACTION
+========================================================= */
 
 function composerAction() {
 
-  /*
-    If currently listening or speaking,
-    button becomes STOP.
-  */
+    /*
+     * If anything is active,
+     * the button is ALWAYS STOP.
+     */
 
-  if (recognition || currentAudio) {
+    if (
+        isListening ||
+        isSpeaking ||
+        isProcessing
+    ) {
 
-    stopEverything();
+        stopEverything();
 
-    return;
-
-  }
-
-
-  /*
-    If user typed something,
-    send it.
-  */
-
-  if (input.value.trim()) {
-
-    sendText();
-
-    return;
-
-  }
+        return;
+    }
 
 
-  /*
-    Otherwise start microphone.
-  */
+    /*
+     * If there is text,
+     * send it.
+     */
 
-  listen();
+    if (input.value.trim()) {
 
+        sendText();
+
+        return;
+    }
+
+
+    /*
+     * Otherwise start microphone.
+     */
+
+    listen();
 }
 
 
 /* =========================================================
-   TEXT MESSAGE
-   ========================================================= */
+   BUTTON
+========================================================= */
 
-function sendText() {
+button.addEventListener(
+    "click",
+    function(event) {
 
-  const text = input.value.trim();
+        event.preventDefault();
 
-  if (!text) {
+        composerAction();
+    }
+);
+
+
+/* =========================================================
+   SEND TEXT
+========================================================= */
+
+async function sendText() {
+
+    const text =
+        input.value.trim();
+
+    if (!text) {
+        return;
+    }
+
+
+    /* Prevent duplicate requests */
+
+    if (
+        isProcessing ||
+        isListening ||
+        isSpeaking
+    ) {
+        return;
+    }
+
+
+    addMessage(
+        text,
+        "user"
+    );
+
+
+    input.value = "";
 
     updateComposerButton();
 
-    return;
 
-  }
+    isProcessing = true;
 
-  input.value = "";
+    setCharacter("thinking");
 
-  updateComposerButton();
+    setStatus(
+        "🌸 Sushree is thinking..."
+    );
 
-  addMessage(
-    text,
-    "user"
-  );
-
-  processMessage(text);
-
-}
+    updateComposerButton();
 
 
-/* =========================================================
-   ENTER KEY
-   ========================================================= */
+    requestController =
+        new AbortController();
 
-input.addEventListener(
-  "keydown",
-  function(event) {
 
-    if (event.key === "Enter") {
+    try {
 
-      event.preventDefault();
+        const response =
+            await fetch(
+                WORKER_URL,
+                {
+                    method: "POST",
 
-      sendText();
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
+                    body: JSON.stringify({
+                        message: text
+                    }),
+
+                    signal:
+                        requestController.signal
+                }
+            );
+
+
+        const raw =
+            await response.text();
+
+
+        let data;
+
+        try {
+
+            data = JSON.parse(raw);
+
+        } catch (error) {
+
+            console.error(
+                "Invalid Worker JSON:",
+                raw
+            );
+
+            throw new Error(
+                "The Worker returned an invalid response."
+            );
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                `Worker error (${response.status})`
+            );
+        }
+
+
+        /*
+         * Accept several common response names.
+         * This makes the frontend less fragile.
+         */
+
+        const reply =
+            data.reply ??
+            data.response ??
+            data.message ??
+            data.text ??
+            data.answer;
+
+
+        if (
+            typeof reply !== "string" ||
+            !reply.trim()
+        ) {
+
+            throw new Error(
+                "No reply was returned by the Worker."
+            );
+        }
+
+
+        addMessage(
+            reply,
+            "assistant"
+        );
+
+
+        /*
+         * Speak the response.
+         */
+
+        isProcessing = false;
+
+        requestController = null;
+
+        updateComposerButton();
+
+        await speak(reply);
+
+
+    } catch (error) {
+
+        if (
+            error.name ===
+            "AbortError"
+        ) {
+            return;
+        }
+
+
+        console.error(
+            "Message error:",
+            error
+        );
+
+
+        addMessage(
+            "⚠️ " +
+            (
+                error.message ||
+                "Something went wrong."
+            ),
+            "assistant"
+        );
+
+
+        isProcessing = false;
+
+        requestController = null;
+
+        setCharacter(null);
+
+        setStatus(
+            "⚠️ Something went wrong"
+        );
+
+        updateComposerButton();
     }
-
-  }
-);
+}
 
 
 /* =========================================================
    SPEECH RECOGNITION
-   ========================================================= */
+========================================================= */
+
+function listen() {
+
+    if (
+        isListening ||
+        isSpeaking ||
+        isProcessing
+    ) {
+        return;
+    }
+
+
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+
+    if (!SpeechRecognition) {
+
+        setStatus(
+            "⚠️ Speech recognition isn't supported."
+        );
+
+        return;
+    }
+
+
+    /*
+     * Make sure an old recognition instance
+     * cannot interfere.
+     */
+
+    if (recognition) {
+
+        try {
+            recognition.stop();
+        } catch (error) {}
+
+        recognition = null;
+    }
+
+
+    recognition =
+        new SpeechRecognition();
+
+
+    recognition.continuous = false;
+
+    recognition.interimResults = true;
+
+    recognition.lang = "en-IN";
+
+
+    let finalText = "";
+
+
+    recognition.onstart =
+        function() {
+
+            isListening = true;
+
+            setCharacter("listening");
+
+            setStatus(
+                "🎙️ Listening..."
+            );
+
+            updateComposerButton();
+        };
+
+
+    recognition.onresult =
+        function(event) {
+
+            let transcript = "";
+
+            for (
+                let i = event.resultIndex;
+                i < event.results.length;
+                i++
+            ) {
+
+                transcript +=
+                    event.results[i][0].transcript;
+            }
+
+
+            input.value =
+                transcript;
+
+
+            if (
+                event.results[
+                    event.results.length - 1
+                ].isFinal
+            ) {
+
+                finalText =
+                    transcript.trim();
+            }
+
+
+            updateComposerButton();
+        };
+
+
+    recognition.onerror =
+        function(event) {
+
+            console.error(
+                "Speech recognition error:",
+                event
+            );
+
+
+            isListening = false;
+
+            recognition = null;
+
+            setCharacter(null);
+
+
+            if (
+                event.error ===
+                "not-allowed"
+            ) {
+
+                setStatus(
+                    "⚠️ Microphone permission denied."
+                );
+
+            } else if (
+                event.error ===
+                "no-speech"
+            ) {
+
+                setStatus(
+                    "No speech detected."
+                );
+
+            } else {
+
+                setStatus(
+                    "⚠️ Microphone error."
+                );
+            }
+
+
+            updateComposerButton();
+        };
+
+
+    recognition.onend =
+        function() {
+
+            isListening = false;
+
+            recognition = null;
+
+            setCharacter(null);
+
+
+            const text =
+                (
+                    finalText ||
+                    input.value
+                ).trim();
+
+
+            updateComposerButton();
+
+
+            /*
+             * Automatically send recognized speech.
+             */
+
+            if (text) {
+
+                input.value = text;
+
+                updateComposerButton();
+
+                sendText();
+
+            } else {
+
+                setStatus(
+                    "Ready to listen"
+                );
+            }
+        };
+
+
+    try {
+
+        recognition.start();
+
+    } catch (error) {
+
+        console.error(
+            "Recognition start failed:",
+            error
+        );
+
+        recognition = null;
+
+        isListening = false;
+
+        setCharacter(null);
+
+        setStatus(
+            "⚠️ Could not start microphone."
+        );
+
+        updateComposerButton();
+    }
+}
+
+
+/* =========================================================
+   TEXT CLEANING FOR TTS
+========================================================= */
+
+function cleanTextForTTS(text) {
+
+    let cleanText =
+        String(text);
+
+
+    /*
+     * Remove emoji / pictographic characters.
+     */
+
+    try {
+
+        cleanText =
+            cleanText.replace(
+                /\p{Emoji_Presentation}|\p{Extended_Pictographic}/gu,
+                ""
+            );
+
+    } catch (error) {
+
+        /*
+         * Older browser fallback.
+         */
+
+        cleanText =
+            cleanText.replace(
+                /[\u{1F300}-\u{1FAFF}]/gu,
+                ""
+            );
+    }
+
+
+    cleanText =
+        cleanText
+            .replace(/\s+/g, " ")
+            .trim();
+
+
+    return cleanText;
+}
+
+
+/* =========================================================
+   TTS
+========================================================= */
+
+async function speak(text) {
+
+    const cleanText =
+        cleanTextForTTS(text);
+
+
+    if (!cleanText) {
+
+        setStatus(
+            "Ready to listen"
+        );
+
+        return;
+    }
+
+
+    /*
+     * Stop previous audio.
+     */
+
+    if (currentAudio) {
+
+        try {
+            currentAudio.pause();
+
+            currentAudio.currentTime = 0;
+
+        } catch (error) {}
+    }
+
+
+    if (currentAudioURL) {
+
+        try {
+            URL.revokeObjectURL(
+                currentAudioURL
+            );
+        } catch (error) {}
+
+        currentAudioURL = null;
+    }
+
+
+    isSpeaking = true;
+
+    setCharacter("speaking");
+
+    setStatus(
+        "🔊 Sushree is preparing to speak..."
+    );
+
+    updateComposerButton();
+
+
+    try {
+
+        const response =
+            await fetch(
+                WORKER_URL,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        action: "tts",
+
+                        message:
+                            cleanText,
+
+                        voice:
+                            "Zephyr"
+                    })
+                }
+            );
+
+
+        const raw =
+            await response.text();
+
+
+        let data;
+
+        try {
+
+            data =
+                JSON.parse(raw);
+
+        } catch (error) {
+
+            console.error(
+                "Invalid TTS JSON:",
+                raw
+            );
+
+            throw new Error(
+                "TTS returned an invalid response."
+            );
+        }
+
+
+        console.log(
+            "TTS response:",
+            data
+        );
+
+
+        if (
+            !response.ok ||
+            data.success === false
+        ) {
+
+            throw new Error(
+  "TTS returned an invalid response."
+);
+}
+
+console.log(
+  "TTS response:",
+  data
+);
+
+if (
+  !response.ok ||
+  data.success === false
+) {
+
+  throw new Error(
+    data.error ||
+    `TTS failed with HTTP ${response.status}`
+  );
+}
+
+if (!data.audio) {
+
+  throw new Error(
+    "No audio was returned by the Worker."
+  );
+}
+
+
+/* =========================================
+   CONVERT WORKER PCM BASE64
+   INTO PLAYABLE WAV
+   ========================================= */
+
+const wavBlob =
+  base64ToWav(
+    data.audio,
+    24000
+  );
+
+
+/* =========================================
+   CREATE AUDIO URL
+   ========================================= */
+
+currentAudioURL =
+  URL.createObjectURL(
+    wavBlob
+  );
+
+
+/* =========================================
+   CREATE AUDIO
+   ========================================= */
+
+const audio =
+  new Audio();
+
+audio.preload = "auto";
+
+audio.src =
+  currentAudioURL;
+
+currentAudio =
+  audio;
+
+
+/* =========================================
+   AUDIO START
+   ========================================= */
+
+audio.onplay = () => {
+
+  statusText.textContent =
+    "🔊 Speaking...";
+
+  updateComposerButton();
+};
+
+
+/* =========================================
+   AUDIO ENDED
+   ========================================= */
+
+audio.onended = () => {
+
+  if (currentAudio === audio) {
+    currentAudio = null;
+  }
+
+  if (currentAudioURL) {
+
+    URL.revokeObjectURL(
+      currentAudioURL
+    );
+
+    currentAudioURL = null;
+  }
+
+  updateComposerButton();
+
+  statusText.textContent =
+    "Ready";
+};
+
+
+/* =========================================
+   AUDIO ERROR
+   ========================================= */
+
+audio.onerror = (event) => {
+
+  console.error(
+    "Audio playback error:",
+    event
+  );
+
+  if (currentAudio === audio) {
+    currentAudio = null;
+  }
+
+  if (currentAudioURL) {
+
+    URL.revokeObjectURL(
+      currentAudioURL
+    );
+
+    currentAudioURL = null;
+  }
+
+  updateComposerButton();
+
+  statusText.textContent =
+    "⚠️ Audio playback failed.";
+};
+
+
+/* =========================================
+   PLAY AUDIO
+   ========================================= */
+
+try {
+
+  await audio.play();
+
+} catch (error) {
+
+  console.error(
+    "Audio play failed:",
+    error
+  );
+
+  if (currentAudio === audio) {
+    currentAudio = null;
+  }
+
+  if (currentAudioURL) {
+
+    URL.revokeObjectURL(
+      currentAudioURL
+    );
+
+    currentAudioURL = null;
+  }
+
+  updateComposerButton();
+
+  statusText.textContent =
+    "⚠️ Could not play audio.";
+}
+
+
+/* =========================================
+   PROCESS MESSAGE ERROR
+   ========================================= */
+
+} catch (error) {
+
+  console.error(
+    "processMessage error:",
+    error
+  );
+
+  if (currentAudio) {
+
+    try {
+      currentAudio.pause();
+    } catch (e) {
+      console.log(
+        "Audio cleanup failed:",
+        e
+      );
+    }
+
+    currentAudio = null;
+  }
+
+  if (currentAudioURL) {
+
+    URL.revokeObjectURL(
+      currentAudioURL
+    );
+
+    currentAudioURL = null;
+  }
+
+  updateComposerButton();
+
+  statusText.textContent =
+    "⚠️ " +
+    (
+      error.message ||
+      "Something went wrong."
+    );
+}
+
+
+/* =========================================
+   STOP EVERYTHING
+   ========================================= */
+
+function stopEverything() {
+
+  /* Stop speech recognition */
+
+  if (recognition) {
+
+    try {
+
+      recognition.onend = null;
+      recognition.stop();
+
+    } catch (error) {
+
+      console.log(
+        "Recognition already stopped."
+      );
+    }
+
+    recognition = null;
+  }
+
+
+  /* Stop audio */
+
+  if (currentAudio) {
+
+    try {
+
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+
+    } catch (error) {
+
+      console.log(
+        "Audio already stopped."
+      );
+    }
+
+    currentAudio = null;
+  }
+
+
+  /* Release audio URL */
+
+  if (currentAudioURL) {
+
+    URL.revokeObjectURL(
+      currentAudioURL
+    );
+
+    currentAudioURL = null;
+  }
+
+
+  updateComposerButton();
+
+  statusText.textContent =
+    "Ready";
+}
+
+
+/* =========================================
+   MAIN COMPOSER ACTION
+   ========================================= */
+
+function composerAction() {
+
+  if (
+    recognition ||
+    currentAudio
+  ) {
+
+    stopEverything();
+
+    return;
+  }
+
+
+  if (
+    input.value.trim()
+  ) {
+
+    sendText();
+
+    return;
+  }
+
+
+  listen();
+}
+
+
+/* =========================================
+   ENTER KEY
+   ========================================= */
+
+input.addEventListener(
+  "keydown",
+  function (event) {
+
+    if (
+      event.key === "Enter"
+    ) {
+
+      event.preventDefault();
+
+      sendText();
+    }
+  }
+);
+
+
+/* =========================================
+   SPEECH RECOGNITION
+   ========================================= */
 
 function listen() {
 
@@ -625,1160 +1522,214 @@ function listen() {
       "⚠️ Speech recognition isn't supported.";
 
     return;
-
   }
 
 
-  /*
-    Make sure old recognition is gone.
-  */
+  /* Stop old recognition */
 
   if (recognition) {
 
     try {
 
+      recognition.onend = null;
       recognition.stop();
 
-    } catch (error) {}
+    } catch (error) {
+
+      console.log(
+        "Old recognition already stopped."
+      );
+    }
 
     recognition = null;
-
   }
 
 
-  recognition =
+  const rec =
     new SpeechRecognition();
 
-
-  /*
-    English India.
-
-    We can later improve this for
-    automatic multilingual recognition.
-  */
-
-  recognition.lang = "en-IN";
-
-  recognition.continuous = false;
-
-  recognition.interimResults = false;
-
-  recognition.maxAlternatives = 1;
+  recognition =
+    rec;
 
 
-  /* ---------------------------
-     START
-  --------------------------- */
+  rec.continuous =
+    false;
 
-  recognition.onstart = function() {
+  rec.interimResults =
+    true;
+
+  rec.lang =
+    "en-IN";
+
+
+  /* =======================================
+     RECOGNITION START
+     ======================================= */
+
+  rec.onstart = () => {
 
     statusText.textContent =
       "🎙️ Listening...";
 
-    character.classList.add(
-      "listening"
-    );
-
-    button.textContent = "⏹";
-
-    button.classList.add(
-      "stop-mode"
-    );
-
-    button.setAttribute(
-      "aria-label",
-      "Stop"
-    );
-
+    updateComposerButton();
   };
 
 
-  /* ---------------------------
-     RESULT
-  --------------------------- */
+  /* =======================================
+     RECOGNITION RESULT
+     ======================================= */
 
-  recognition.onresult = function(event) {
+  rec.onresult = (event) => {
 
-    const result =
-      event.results[0][0];
+    let transcript = "";
 
-    const text =
-      result.transcript.trim();
+    for (
+      let i = event.resultIndex;
+      i < event.results.length;
+      i++
+    ) {
 
-
-    character.classList.remove(
-      "listening"
-    );
-
-
-    if (!text) {
-
-      return;
-
+      transcript +=
+        event.results[i][0].transcript;
     }
 
+    input.value =
+      transcript;
 
-    input.value = "";
-
-    addMessage(
-      text,
-      "user"
-    );
-
-
-    processMessage(text);
-
+    updateComposerButton();
   };
 
 
-  /* ---------------------------
-     ERROR
-  --------------------------- */
+  /* =======================================
+     RECOGNITION ERROR
+     ======================================= */
 
-  recognition.onerror = function(event) {
+  rec.onerror = (event) => {
 
     console.error(
       "Speech recognition error:",
       event.error
     );
 
-
-    character.classList.remove(
-      "listening"
-    );
-
-
     recognition = null;
 
+    updateComposerButton();
 
-    /*
-      Don't show an annoying error
-      for normal microphone cancellation.
-    */
 
     if (
-      event.error === "aborted"
-    ) {
-
-      statusText.textContent =
-        "Ready to listen";
-
-    } else if (
-      event.error === "not-allowed" ||
-      event.error === "service-not-allowed"
+      event.error ===
+      "not-allowed"
     ) {
 
       statusText.textContent =
         "⚠️ Microphone permission denied.";
 
-    } else if (
-      event.error === "no-speech"
+      return;
+    }
+
+
+    if (
+      event.error ===
+      "no-speech"
     ) {
 
       statusText.textContent =
-        "I couldn't hear that. Try again.";
+        "⚠️ No speech detected.";
 
-    } else {
-
-      statusText.textContent =
-        "⚠️ Voice input error.";
-
+      return;
     }
 
 
-    updateComposerButton();
-
+    statusText.textContent =
+      "⚠️ Speech recognition failed.";
   };
 
 
-  /* ---------------------------
-     END
-  --------------------------- */
+  /* =======================================
+     RECOGNITION END
+     ======================================= */
 
-  recognition.onend = function() {
-
-    character.classList.remove(
-      "listening"
-    );
-
+  rec.onend = () => {
 
     recognition = null;
 
+    updateComposerButton();
 
-    /*
-      If Sushree isn't speaking,
-      return button to normal.
-    */
 
-    if (!currentAudio) {
+    const text =
+      input.value.trim();
+
+
+    if (!text) {
 
       statusText.textContent =
-        "Ready to listen";
+        "Ready";
 
-      updateComposerButton();
-
+      return;
     }
 
+
+    processMessage(
+      text
+    );
   };
 
 
-  /* ---------------------------
+  /* =======================================
      START MICROPHONE
-  --------------------------- */
+     ======================================= */
 
   try {
 
-    recognition.start();
+    rec.start();
 
   } catch (error) {
 
     console.error(
-      "Could not start recognition:",
+      "Could not start microphone:",
       error
     );
 
     recognition = null;
 
-    character.classList.remove(
-      "listening"
-    );
-
-    statusText.textContent =
-      "⚠️ Couldn't start microphone.";
-
     updateComposerButton();
 
+    statusText.textContent =
+      "⚠️ Could not start microphone.";
   }
-
 }
 
 
-/* =========================================================
-   PROCESS MESSAGE
-   ========================================================= */
+/* =========================================
+   COMPOSER BUTTON
+   ========================================= */
 
-async function processMessage(text) {
+if (button) {
 
-  statusText.textContent =
-    "🧠 Thinking...";
-
-  character.classList.add(
-    "thinking"
+  button.addEventListener(
+    "click",
+    composerAction
   );
-
-
-  /* ---------------------------
-     REMEMBER USER'S NAME
-  --------------------------- */
-
-  const nameMatch = text.match(
-    /\b(?:my name is|i am|i'm|call me)\s+([A-Za-z][A-Za-z\s'-]{0,30})/i
-  );
-
-
-  if (nameMatch) {
-
-    const name =
-      nameMatch[1].trim();
-
-    remember(
-      "name",
-      name
-    );
-
-  }
-
-
-  /* ---------------------------
-     MEMORY CONTEXT
-  --------------------------- */
-
-  const memoryContext =
-    Object.keys(memory).length
-
-      ? `Known information about the user: ${JSON.stringify(memory)}`
-
-      : "No saved information about the user yet.";
-
-
-  try {
-
-    /* ---------------------------
-       CALL WORKER
-    --------------------------- */
-
-    const response =
-      await fetch(
-        WORKER_URL,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body: JSON.stringify({
-
-            message:
-              `${memoryContext}\n\nUser's message: ${text}`,
-
-            history:
-              history
-
-          })
-
-        }
-      );
-
-
-    /* ---------------------------
-       READ RESPONSE
-    --------------------------- */
-
-    const raw =
-      await response.text();
-
-
-    let data;
-
-
-    try {
-
-      data =
-        JSON.parse(raw);
-
-    } catch (error) {
-
-      console.error(
-        "Invalid JSON from Worker:",
-        raw
-      );
-
-      throw new Error(
-        "Worker returned an invalid response."
-      );
-
-    }
-
-
-    console.log(
-      "Worker response:",
-      data
-    );
-
-
-    /* ---------------------------
-       HTTP ERROR
-    --------------------------- */
-
-    if (!response.ok) {
-
-      throw new Error(
-
-        data.details
-
-          ? JSON.stringify(
-              data.details
-            )
-
-          : (
-              data.error ||
-              `Worker returned HTTP ${response.status}`
-            )
-
-      );
-
-    }
-
-
-    /* ---------------------------
-       SUCCESS
-    --------------------------- */
-
-    if (
-      data.success &&
-      data.reply
-    ) {
-
-      /*
-        Save conversation history.
-      */
-
-      history.push({
-
-        role: "user",
-
-        parts: [
-          {
-            text: text
-          }
-        ]
-
-      });
-
-
-      history.push({
-
-        role: "model",
-
-        parts: [
-          {
-            text: data.reply
-          }
-        ]
-
-      });
-
-
-      /*
-        Prevent unlimited history growth.
-      */
-
-      if (history.length > 30) {
-
-        history =
-          history.slice(-30);
-
-      }
-
-
-      character.classList.remove(
-        "thinking"
-      );
-
-
-      addMessage(
-        data.reply,
-        "sushree"
-      );
-
-
-      /*
-        Speak the AI response.
-      */
-
-      speak(
-        data.reply
-      );
-
-
-    } else {
-
-      character.classList.remove(
-        "thinking"
-      );
-
-
-      addMessage(
-
-        data.error ||
-        "Sorry, I couldn't get a response right now.",
-
-        "sushree"
-
-      );
-
-
-      statusText.textContent =
-        "Ready to listen";
-
-    }
-
-  } catch (error) {
-
-    console.error(
-      "Sushree API Error:",
-      error
-    );
-
-
-    character.classList.remove(
-      "thinking"
-    );
-
-
-    addMessage(
-
-      `Sorry, something went wrong: ${error.message}`,
-
-      "sushree"
-
-    );
-
-
-    statusText.textContent =
-      "⚠️ Connection error";
-
-  }
-
 }
 
 
-/* =========================================================
-   GEMINI TTS — ZEPHYR
-   ========================================================= */
-
-/*
-  Gemini returns raw PCM audio.
-
-  We convert the PCM bytes into a WAV file
-  so the browser can play it.
-*/
-
-
-function base64ToWav(
-  base64,
-  sampleRate = 24000
-) {
-
-  const binary =
-    atob(base64);
-
-
-  const pcm =
-    new Uint8Array(
-      binary.length
-    );
-
-
-  for (
-    let i = 0;
-    i < binary.length;
-    i++
-  ) {
-
-    pcm[i] =
-      binary.charCodeAt(i);
-
-  }
-
-
-  const dataLength =
-    pcm.length;
-
-
-  const buffer =
-    new ArrayBuffer(
-      44 + dataLength
-    );
-
-
-  const view =
-    new DataView(buffer);
-
-
-  function writeString(
-    offset,
-    string
-  ) {
-
-    for (
-      let i = 0;
-      i < string.length;
-      i++
-    ) {
-
-      view.setUint8(
-        offset + i,
-        string.charCodeAt(i)
-      );
-
-    }
-
-  }
-
-
-  /* RIFF */
-
-  writeString(
-    0,
-    "RIFF"
-  );
-
-
-  view.setUint32(
-    4,
-    36 + dataLength,
-    true
-  );
-
-
-  writeString(
-    8,
-    "WAVE"
-  );
-
-
-  /* fmt */
-
-  writeString(
-    12,
-    "fmt "
-  );
-
-
-  view.setUint32(
-    16,
-    16,
-    true
-  );
-
-
-  /*
-    PCM format
-  */
-
-  view.setUint16(
-    20,
-    1,
-    true
-  );
-
-
-  /*
-    Mono
-  */
-
-  view.setUint16(
-    22,
-    1,
-    true
-  );
-
-
-  /*
-    Sample rate
-  */
-
-  view.setUint32(
-    24,
-    sampleRate,
-    true
-  );
-
-
-  /*
-    Byte rate
-    24000 × 1 × 16/8
-  */
-
-  view.setUint32(
-    28,
-    sampleRate * 2,
-    true
-  );
-
-
-  /*
-    Block align
-  */
-
-  view.setUint16(
-    32,
-    2,
-    true
-  );
-
-
-  /*
-    16-bit audio
-  */
-
-  view.setUint16(
-    34,
-    16,
-    true
-  );
-
-
-  /* data */
-
-  writeString(
-    36,
-    "data"
-  );
-
-
-  view.setUint32(
-    40,
-    dataLength,
-    true
-  );
-
-
-  /*
-    Copy PCM data.
-  */
-
-  new Uint8Array(
-    buffer,
-    44
-  ).set(pcm);
-
-
-  return new Blob(
-    [buffer],
-    {
-      type: "audio/wav"
-    }
-  );
-
-}
-
-
-/* =========================================================
-   SPEAK
-   ========================================================= */
-
-async function speak(text) {
-
-  if (
-    !text ||
-    !text.trim()
-  ) {
-
-    return;
-
-  }
-
-
-  /*
-    Stop old audio.
-  */
-
-  if (currentAudio) {
-
-    try {
-
-      currentAudio.pause();
-
-      currentAudio.currentTime = 0;
-
-    } catch (error) {}
-
-    currentAudio = null;
-
-  }
-
-
-  /*
-    Clean text for TTS.
-  */
-
-  let cleanText =
-    String(text);
-
-
-  try {
-
-    cleanText =
-      cleanText.replace(
-        /\p{Emoji_Presentation}|\p{Extended_Pictographic}/gu,
-        ""
-      );
-
-  } catch (error) {
-
-    /*
-      Older browsers may not support
-      Unicode property escapes.
-    */
-
-    cleanText =
-      cleanText.replace(
-        /[\u{1F300}-\u{1FAFF}]/gu,
-        ""
-      );
-
-  }
-
-
-  cleanText =
-    cleanText
-      .replace(
-        /\s+/g,
-        " "
-      )
-      .trim();
-
-
-  if (!cleanText) {
-
-    statusText.textContent =
-      "Ready to listen";
-
-    character.classList.remove(
-      "speaking"
-    );
-
-    updateComposerButton();
-
-    return;
-
-  }
-
-
-  try {
-
-    statusText.textContent =
-      "🔊 Sushree is preparing to speak...";
-
-
-    character.classList.remove(
-      "thinking"
-    );
-
-
-    character.classList.add(
-      "speaking"
-    );
-
-
-    button.textContent =
-      "⏹️";
-
-
-    button.classList.add(
-      "stop-mode"
-    );
-
-
-    button.setAttribute(
-      "aria-label",
-      "Stop"
-    );
-
-
-    /* ---------------------------
-       REQUEST TTS
-    --------------------------- */
-
-    const response =
-      await fetch(
-        WORKER_URL,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body: JSON.stringify({
-
-            action: "tts",
-
-            message: cleanText,
-
-            voice: "Zephyr"
-
-          })
-
-        }
-      );
-
-
-    /* ---------------------------
-       RESPONSE
-    --------------------------- */
-
-    const raw =
-      await response.text();
-
-
-    let data;
-
-
-    try {
-
-      data =
-        JSON.parse(raw);
-
-    } catch (error) {
-
-      console.error(
-        "Invalid TTS JSON:",
-        raw
-      );
-
-      throw new Error(
-        "TTS returned an invalid response."
-      );
-
-    }
-
-
-    console.log(
-      "TTS response:",
-      data
-    );
-
-
-    if (
-      !response.ok ||
-      !data.success
-    ) {
-
-      throw new Error(
-        data.error ||
-        `TTS failed with HTTP ${response.status}`
-      );
-
-    }
-
-
-    if (!data.audio) {
-
-      throw new Error(
-        "No audio was returned by the Worker."
-      );
-
-    }
-
-
-    /* ---------------------------
-       PCM → WAV
-    --------------------------- */
-
-    const wavBlob =
-      base64ToWav(
-        data.audio,
-        24000
-      );
-
-
-    const audioURL =
-      URL.createObjectURL(
-        wavBlob
-      );
-
-
-const audio = new Audio();
-
-audio.preload = "auto";
-audio.setAttribute("playsinline", "");
-audio.volume = 1.0;
-audio.src = audioURL;
-
-currentAudio = audio;
-
-/* --------------------------
-   PLAY
--------------------------- */
-
-audio.onplay = function() {
-
-    statusText.textContent =
-        "🔊 Sushree is speaking...";
-
-};
-
-audio.onended = function() {
-
-    URL.revokeObjectURL(audioURL);
-
-    if (currentAudio === audio) {
-        currentAudio = null;
-    }
-
-    character.classList.remove(
-        "speaking"
-    );
-
-    statusText.textContent =
-        "Ready to listen";
-
-    updateComposerButton();
-
-};
-
-audio.onerror = function(error) {
-
-    console.error(
-        "Audio playback error:",
-        error
-    );
-
-    URL.revokeObjectURL(audioURL);
-
-    if (currentAudio === audio) {
-        currentAudio = null;
-    }
-
-    character.classList.remove(
-        "speaking"
-    );
-
-    statusText.textContent =
-        "⚠️ Audio playback failed";
-
-    updateComposerButton();
-
-};
-
-/* --------------------------
-   START PLAYBACK
--------------------------- */
-
-try {
-
-    await audio.play();
-
-} catch (error) {
-
-    console.error(
-        "Sushree audio.play() failed:",
-        error
-    );
-
-    console.error(
-        "Error name:",
-        error?.name
-    );
-
-    console.error(
-        "Error message:",
-        error?.message
-    );
-
-    URL.revokeObjectURL(audioURL);
-
-    if (currentAudio === audio) {
-        currentAudio = null;
-    }
-
-    character.classList.remove(
-        "speaking"
-    );
-
-    statusText.textContent =
-        "⚠️ " +
-        (error?.message ||
-         "Voice unavailable");
-
-    updateComposerButton();
-
-}
-    
-}
-
-
-/* =========================================================
-   STOP EVERYTHING
-   ========================================================= */
-
-function stopEverything() {
-
-  /* ---------------------------
-     STOP MICROPHONE
-  --------------------------- */
-
-  if (recognition) {
-
-    try {
-
-      recognition.abort();
-
-    } catch (error) {}
-
-    recognition = null;
-
-  }
-
-
-  /* ---------------------------
-     STOP AUDIO
-  --------------------------- */
-
-  if (currentAudio) {
-
-    try {
-
-      currentAudio.pause();
-
-      currentAudio.currentTime = 0;
-
-    } catch (error) {}
-
-    currentAudio = null;
-
-  }
-
-
-  /*
-    Also stop browser speech
-    synthesis if anything is active.
-  */
-
-  if (
-    "speechSynthesis" in window
-  ) {
-
-    try {
-
-      speechSynthesis.cancel();
-
-    } catch (error) {}
-
-  }
-
-
-  /* ---------------------------
-     RESET CHARACTER
-  --------------------------- */
-
-  character.classList.remove(
-    "listening"
-  );
-
-  character.classList.remove(
-    "thinking"
-  );
-
-  character.classList.remove(
-    "speaking"
-  );
-
-
-  /* ---------------------------
-     RESET STATUS
-  --------------------------- */
-
-  statusText.textContent =
-    "Ready to listen";
-
-
-  /* ---------------------------
-     RESET BUTTON
-  --------------------------- */
-
-  updateComposerButton();
-
-}
-
-
-/* =========================================================
-   INITIAL STATE
-   ========================================================= */
+/* =========================================
+   INITIAL BUTTON STATE
+   ========================================= */
 
 updateComposerButton();
 
-statusText.textContent =
-  "Ready to listen";
-
-
 /* =========================================================
-   DEBUG INFORMATION
+   CLEANUP
    ========================================================= */
 
-console.log(
-  "Sushree AI initialized successfully."
-);
+window.addEventListener(
+  "pagehide",
+  function() {
 
-console.log(
-  "Worker:",
-  WORKER_URL
+    stopEverything();
+
+  }
 );
 
 </script>
