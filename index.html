@@ -1660,29 +1660,25 @@ async function speak(text) {
     await audio.play();
 
 
-  } catch (error) {
+} catch (error) {
 
     console.error(
-      "Sushree TTS Error:",
-      error
+        "Sushree TTS Error:",
+        error
     );
-
 
     character.classList.remove(
-      "speaking"
+        "speaking"
     );
-
 
     currentAudio = null;
 
-
     statusText.textContent =
-      "⚠️ Voice unavailable";
-
+        "⚠️ " + (error?.message || "Voice unavailable");
 
     updateComposerButton();
 
-  }
+}
 
 }
 
