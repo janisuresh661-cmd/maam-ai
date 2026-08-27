@@ -1554,132 +1554,111 @@ async function speak(text) {
       );
 
 
-    const audio =
-      new Audio(
-        audioURL
-      );
+const audio = new Audio();
 
+audio.preload = "auto";
+audio.src = audioURL;
 
-    currentAudio =
-      audio;
+currentAudio = audio;
 
+/* --------------------------
+   PLAY
+-------------------------- */
 
-    /* ---------------------------
-       PLAY
-    --------------------------- */
+audio.onplay = function() {
 
-    audio.onplay =
-      function() {
+    statusText.textContent =
+        "🔊 Sushree is speaking...";
 
-        statusText.textContent =
-          "🔊 Sushree is speaking...";
+};
 
-      };
+audio.onended = function() {
 
+    URL.revokeObjectURL(audioURL);
 
-    /* ---------------------------
-       FINISHED
-    --------------------------- */
-
-    audio.onended =
-      function() {
-
-        URL.revokeObjectURL(
-          audioURL
-        );
-
-
-        if (
-          currentAudio === audio
-        ) {
-
-          currentAudio = null;
-
-        }
-
-
-        character.classList.remove(
-          "speaking"
-        );
-
-
-        statusText.textContent =
-          "Ready to listen";
-
-
-        updateComposerButton();
-
-      };
-
-
-    /* ---------------------------
-       AUDIO ERROR
-    --------------------------- */
-
-    audio.onerror =
-      function(error) {
-
-        console.error(
-          "Audio playback error:",
-          error
-        );
-
-
-        URL.revokeObjectURL(
-          audioURL
-        );
-
-
-        if (
-          currentAudio === audio
-        ) {
-
-          currentAudio = null;
-
-        }
-
-
-        character.classList.remove(
-          "speaking"
-        );
-
-
-        statusText.textContent =
-          "⚠️ Audio playback error";
-
-
-        updateComposerButton();
-
-      };
-
-
-    /*
-      Start playback.
-    */
-
-    await audio.play();
-
-
-} catch (error) {
-
-    console.error(
-        "Sushree TTS Error:",
-        error
-    );
+    if (currentAudio === audio) {
+        currentAudio = null;
+    }
 
     character.classList.remove(
         "speaking"
     );
 
-    currentAudio = null;
+    statusText.textContent =
+        "Ready to listen";
+
+    updateComposerButton();
+
+};
+
+audio.onerror = function(error) {
+
+    console.error(
+        "Audio playback error:",
+        error
+    );
+
+    URL.revokeObjectURL(audioURL);
+
+    if (currentAudio === audio) {
+        currentAudio = null;
+    }
+
+    character.classList.remove(
+        "speaking"
+    );
 
     statusText.textContent =
-        "⚠️ " + (error?.message || "Voice unavailable");
+        "⚠️ Audio playback failed";
+
+    updateComposerButton();
+
+};
+
+/* --------------------------
+   START PLAYBACK
+-------------------------- */
+
+try {
+
+    await audio.play();
+
+} catch (error) {
+
+    console.error(
+        "Sushree audio.play() failed:",
+        error
+    );
+
+    console.error(
+        "Error name:",
+        error?.name
+    );
+
+    console.error(
+        "Error message:",
+        error?.message
+    );
+
+    URL.revokeObjectURL(audioURL);
+
+    if (currentAudio === audio) {
+        currentAudio = null;
+    }
+
+    character.classList.remove(
+        "speaking"
+    );
+
+    statusText.textContent =
+        "⚠️ " +
+        (error?.message ||
+         "Voice unavailable");
 
     updateComposerButton();
 
 }
-
+    
 }
 
 
